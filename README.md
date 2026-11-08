@@ -20,7 +20,11 @@ The design and the reasons behind it are in [documentation/architecture.md](docu
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/vaishnavi33/Legalcore)
 
-This sets up the database, API and website on Render's free plan from `render.yaml`. It loads the demo accounts below, so use it for trying things out only. Free services sleep when nobody visits, and the first page after a while takes about a minute to load.
+This sets up the database, API and website on Render's free plan from `render.yaml`.
+
+Alternatively, create one Render **Web Service** from this repository with the **Docker** runtime. The root `Dockerfile` runs the API and website together with a built-in SQLite database. That data resets whenever the service restarts.
+
+ It loads the demo accounts below, so use it for trying things out only. Free services sleep when nobody visits, and the first page after a while takes about a minute to load.
 
 ## Run it on your computer
 
