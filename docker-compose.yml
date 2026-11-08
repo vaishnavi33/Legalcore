@@ -1,0 +1,46 @@
+# Runs the whole platform on one server: database, API and website.
+#   cp .env.example .env   # then fill it in
+#   docker compose up -d --build
+# Put a reverse proxy with HTTPS (Caddy, Nginx, or a cloud load balancer) in front of port 3000.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: legalcore
+      POSTGRES_DB: legalcore
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U legalcore"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads:/data/uploads
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        API_URL: http://api:8000
+        NEXT_PUBLIC_CONTACT_PHONE: ${NEXT_PUBLIC_CONTACT_PHONE:-}
+        NEXT_PUBLIC_CONTACT_EMAIL: ${NEXT_PUBLIC_CONTACT_EMAIL:-}
+        NEXT_PUBLIC_CONTACT_WHATSAPP: ${NEXT_PUBLIC_CONTACT_WHATSAPP:-}
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
+  uploads:
