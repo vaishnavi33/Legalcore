@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-const API_URL = process.env.API_URL || "http://localhost:8000";
-
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
@@ -12,10 +10,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
-  // The browser talks to one origin; Next.js forwards API calls to FastAPI.
-  async rewrites() {
-    return [{ source: "/api/:path*", destination: `${API_URL}/api/:path*` }];
-  },
+  // The browser talks to one origin. app/api/[...path]/route.ts forwards API calls to FastAPI,
+  // reading API_URL when the server runs, so the same build works in every environment.
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

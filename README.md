@@ -16,6 +16,12 @@ Everyone uses one sign-in. After signing in, people see the pages and requests t
 
 The design and the reasons behind it are in [documentation/architecture.md](documentation/architecture.md). The steps to put the platform online are in [documentation/deployment.md](documentation/deployment.md).
 
+## Free online preview
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/vaishnavi33/Legalcore)
+
+This sets up the database, API and website on Render's free plan from `render.yaml`. It loads the demo accounts below, so use it for trying things out only. Free services sleep when nobody visits, and the first page after a while takes about a minute to load.
+
 ## Run it on your computer
 
 You need Python 3.12+, Node 22+ and PostgreSQL 16.

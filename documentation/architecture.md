@@ -7,7 +7,7 @@ Browser ──► Next.js website (port 3000) ──/api/*──► FastAPI (por
                                                          └──► private document storage
 ```
 
-The browser only ever talks to the website's address. Next.js forwards `/api/*` to FastAPI, so the session cookie stays first-party and there is no cross-site setup to secure.
+The browser only ever talks to the website's address. A Next.js route (`frontend/app/api/[...path]/route.ts`) forwards `/api/*` to FastAPI at `API_URL`, so the session cookie stays first-party and there is no cross-site setup to secure.
 
 ## One sign-in for everyone
 

@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,6 +31,15 @@ class Settings(BaseSettings):
     rate_limit_login_per_min: int = 10
     rate_limit_track_per_min: int = 20
     rate_limit_create_per_min: int = 10
+
+    @field_validator("database_url")
+    @classmethod
+    def _driver(cls, v: str) -> str:
+        # Hosts such as Render give postgres:// or postgresql:// URLs; SQLAlchemy needs the psycopg driver named.
+        for prefix in ("postgres://", "postgresql://"):
+            if v.startswith(prefix):
+                return "postgresql+psycopg://" + v[len(prefix):]
+        return v
 
     @property
     def is_production(self) -> bool:

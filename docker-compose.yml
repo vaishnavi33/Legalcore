@@ -31,11 +31,12 @@ services:
     build:
       context: ./frontend
       args:
-        API_URL: http://api:8000
         NEXT_PUBLIC_CONTACT_PHONE: ${NEXT_PUBLIC_CONTACT_PHONE:-}
         NEXT_PUBLIC_CONTACT_EMAIL: ${NEXT_PUBLIC_CONTACT_EMAIL:-}
         NEXT_PUBLIC_CONTACT_WHATSAPP: ${NEXT_PUBLIC_CONTACT_WHATSAPP:-}
     restart: unless-stopped
+    environment:
+      API_URL: http://api:8000
     depends_on:
       - api
     ports:
