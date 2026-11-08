@@ -49,3 +49,19 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the all-in-one preview image
+        run: docker build -t legalcore-preview .
+      - name: Start it and check the website and API answer
+        run: |
+          docker run -d --name lc -p 10000:10000 -e COOKIE_SECURE=false legalcore-preview
+          for i in $(seq 1 60); do curl -sf localhost:10000/api/health && break; sleep 2; done
+          curl -sf localhost:10000/api/health
+          curl -sf -o /dev/null localhost:10000/
+          docker logs lc | tail -20
+      - name: Build the production images
+        run: docker build -t legalcore-api backend && docker build -t legalcore-web frontend
