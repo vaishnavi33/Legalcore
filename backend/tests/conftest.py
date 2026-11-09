@@ -8,6 +8,9 @@ os.environ["ADMIN_PASSWORD"] = "Admin@12345"
 os.environ["RATE_LIMIT_LOGIN_PER_MIN"] = "1000"
 os.environ["RATE_LIMIT_CREATE_PER_MIN"] = "1000"
 os.environ["RATE_LIMIT_TRACK_PER_MIN"] = "1000"
+os.environ["RATE_LIMIT_OTP_PER_HOUR"] = "1000"
+os.environ["DEMO_PASSWORD"] = "Demo@12345"
+os.environ["DEMO_MODE"] = "true"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
@@ -47,18 +50,26 @@ class Api:
 
     def create(self, files=None, **data):
         import json
+        from datetime import timedelta
+
+        from app.core.security import india_today
 
         body = {
             "audience": "individual",
             "service": "advocate-consultation",
-            "branch": "hyderabad",
             "name": "Test Person",
             "phone": "9876543210",
             "message": "My landlord is not returning the deposit.",
+            "needed_by": (india_today() + timedelta(days=5)).isoformat(),
             "consent": True,
         }
         body.update(data)
         return self.c.post("/api/v1/requests", data={"data": json.dumps(body)}, files=files or [])
+
+    def allocate(self, number, branch="hyderabad"):
+        r = self.c.post(f"/api/v1/requests/{number}/transfer", json={"branch": branch})
+        assert r.status_code == 200, r.text
+        return r.json()
 
     def __getattr__(self, name):
         return getattr(self.c, name)
@@ -72,3 +83,7 @@ def api():
 @pytest.fixture
 def make_api():
     return Api
+
+
+def admin(make=None):
+    return (make or Api)().login("admin@legalcore.in", "Admin@12345")

@@ -3,6 +3,8 @@ through an authorised download endpoint. Swap LocalStorage for an S3 implementat
 
 import hashlib
 import secrets
+import socket
+import struct
 from pathlib import Path
 
 from fastapi import HTTPException, UploadFile
@@ -29,8 +31,32 @@ MAGIC = {
 
 
 class StoredFile:
-    def __init__(self, filename: str, content_type: str, size: int, sha256: str, key: str):
+    def __init__(self, filename: str, content_type: str, size: int, sha256: str, key: str, scan_status: str):
         self.filename, self.content_type, self.size, self.sha256, self.key = filename, content_type, size, sha256, key
+        self.scan_status = scan_status
+
+
+def scan(data: bytes) -> str:
+    """Virus scan through a ClamAV daemon when CLAMD_HOST is set. Returns clean, infected or not_scanned.
+    If the scanner is configured but unreachable the upload is refused rather than accepted unscanned."""
+    s = get_settings()
+    if not s.clamd_host:
+        return "not_scanned"
+    try:
+        with socket.create_connection((s.clamd_host, s.clamd_port), timeout=15) as sock:
+            sock.sendall(b"zINSTREAM\0")
+            for i in range(0, len(data), 8192):
+                chunk = data[i : i + 8192]
+                sock.sendall(struct.pack("!L", len(chunk)) + chunk)
+            sock.sendall(struct.pack("!L", 0))
+            reply = sock.recv(4096).decode(errors="replace")
+    except OSError:
+        raise HTTPException(status_code=503, detail="Our virus scanner is not available right now. Please try again shortly.") from None
+    if "FOUND" in reply:
+        return "infected"
+    if reply.strip().endswith("OK"):
+        return "clean"
+    raise HTTPException(status_code=503, detail="We could not scan this file. Please try again shortly.")
 
 
 class LocalStorage:
@@ -57,11 +83,14 @@ class LocalStorage:
             raise HTTPException(status_code=400, detail=f"{name} is empty.")
         if not any(data.startswith(m) for m in MAGIC[ext]):
             raise HTTPException(status_code=400, detail=f"{name} does not look like a real {ext} file.")
+        result = scan(data)
+        if result == "infected":
+            raise HTTPException(status_code=400, detail=f"{name} was blocked by our virus scanner.")
         key = f"{secrets.token_hex(2)}/{secrets.token_urlsafe(24)}{ext}"
         p = self.path_for(key)
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(data)
-        return StoredFile(name, ALLOWED[ext], len(data), hashlib.sha256(data).hexdigest(), key)
+        return StoredFile(name, ALLOWED[ext], len(data), hashlib.sha256(data).hexdigest(), key, result)
 
 
 _storage: LocalStorage | None = None

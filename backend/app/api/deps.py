@@ -24,7 +24,7 @@ def optional_user(request: Request, db: DB) -> User | None:
     if not tok:
         return None
     data = decode_access_token(tok)
-    if not data:
+    if not data or data.get("typ", "session") != "session":
         return None
     try:
         user = db.get(User, uuid.UUID(data["sub"]))

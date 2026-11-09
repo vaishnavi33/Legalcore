@@ -1,21 +1,27 @@
 """Load branches and services, and create the first super admin.
 
     python -m app.seed            # safe to run on every deploy
-    python -m app.seed --demo     # also add demo staff and sample requests (never in production)
-"""
+    python -m app.seed --demo     # also add fictional demo staff and dummy requests (never in production)
 
+Demo accounts use the password in DEMO_PASSWORD. If it is not set, a random password is generated and printed to the
+server log only, so no demo credential is ever published."""
+
+import os
+import secrets
 import sys
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 
 from app.core.config import get_settings
 from app.core.db import SessionLocal
-from app.core.security import hash_password, new_request_number
+from app.core.security import hash_password, india_today, new_request_number
 from app.models import (
     Audience,
     Branch,
     LawyerProfile,
     LegalRequest,
+    Priority,
     RequestAssignment,
     RequestHistory,
     Role,
@@ -26,6 +32,7 @@ from app.models import (
     UserRole,
 )
 
+# slug, code, name, Telugu name, state. Addresses and phone numbers are entered by an administrator; none are invented.
 BRANCHES = [
     ("anantapur", "ATP", "Anantapur", "అనంతపురం", "Andhra Pradesh"),
     ("puttaparthi", "PTP", "Puttaparthi", "పుట్టపర్తి", "Andhra Pradesh"),
@@ -35,25 +42,40 @@ BRANCHES = [
     ("hyderabad", "HYD", "Hyderabad", "హైదరాబాద్", "Telangana"),
 ]
 
+L, I, B = "lawyer", "individual", "business"
+# slug, name, category, audiences. "advice" services always pass through a verified advocate.
 SERVICES = [
-    ("case-drafting", "Case Drafting", "drafting", "lawyer"),
-    ("legal-research", "Legal Research", "research", "lawyer"),
-    ("legal-documentation", "Legal Documentation", "documentation", "both"),
-    ("agreement-drafting", "Agreement Drafting", "drafting", "both"),
-    ("legal-notices", "Legal Notices", "drafting", "both"),
-    ("document-assistance", "Document Assistance", "documentation", "individual"),
-    ("advocate-consultation", "Advocate Consultation", "advice", "individual"),
-    ("legal-query", "Legal Query", "advice", "individual"),
+    ("case-drafting", "Case Drafting", "drafting", [L]),
+    ("legal-research", "Legal Research", "research", [L]),
+    ("legal-documentation", "Legal Documentation", "documentation", [L, I, B]),
+    ("agreement-drafting", "Agreement Drafting", "drafting", [L, I, B]),
+    ("legal-notices", "Legal Notice Assistance", "drafting", [L, I, B]),
+    ("document-assistance", "Document Assistance", "documentation", [I]),
+    ("advocate-consultation", "Advocate Consultation", "advice", [I, B]),
+    ("legal-query", "Legal Consultation Coordination", "advice", [I, B]),
+    ("legal-opinion", "Legal Opinion", "advice", [I, B]),
+    ("case-preparation", "Case Preparation Assistance", "research", [L]),
+    ("document-review", "Document Review", "documentation", [L, I, B]),
+    ("property-documentation", "Property Documentation Assistance", "documentation", [I]),
+    ("case-documentation", "Case-related Documentation", "documentation", [I]),
+    ("business-agreements", "Business Agreements", "drafting", [B]),
+    ("contract-drafting", "Contract Drafting Assistance", "drafting", [B]),
+    ("employment-documentation", "Employment Documentation", "documentation", [B]),
+    ("business-legal-support", "Business Legal Support", "documentation", [B]),
+    ("other", "Other", "other", [L, I, B]),
 ]
 
 
 def seed_catalogue(db) -> None:
     for slug, code, name, te, state in BRANCHES:
         if not db.scalar(select(Branch).where(Branch.slug == slug)):
-            db.add(Branch(slug=slug, code=code, name=name, name_te=te, state=state))
+            db.add(Branch(slug=slug, code=code, name=name, name_te=te, state=state, office_status="planned"))
     for slug, name, cat, aud in SERVICES:
-        if not db.scalar(select(Service).where(Service.slug == slug)):
-            db.add(Service(slug=slug, name=name, category=cat, audience=aud))
+        s = db.scalar(select(Service).where(Service.slug == slug))
+        if not s:
+            db.add(Service(slug=slug, name=name, category=cat, audience=",".join(aud)))
+        else:  # keep names and audiences in step with the code; fees and on/off stay as the admin set them
+            s.name, s.category, s.audience = name, cat, ",".join(aud)
     db.flush()
 
 
@@ -71,14 +93,11 @@ def seed_admin(db) -> None:
     print(f"Created super admin {s.admin_email}")
 
 
-DEMO_PASSWORD = "Demo@12345"
-
-
-def _user(db, name, mobile, email, roles, branches=()):
+def _user(db, pw_hash, name, mobile, email, roles, branches=()):
     u = db.scalar(select(User).where(User.mobile == mobile))
     if u:
         return u
-    u = User(name=name, mobile=mobile, email=email, password_hash=hash_password(DEMO_PASSWORD))
+    u = User(name=name, mobile=mobile, email=email, password_hash=pw_hash)
     for r in roles:
         u.roles.append(UserRole(role=r))
     for slug in branches:
@@ -90,29 +109,54 @@ def _user(db, name, mobile, email, roles, branches=()):
 
 
 def seed_demo(db) -> None:
+    """Fictional people and dummy matters for the demo site. Mobile numbers 90000000xx are not real."""
     if get_settings().is_production:
         raise SystemExit("Refusing to add demo data in production.")
-    admin = _user(db, "Demo Admin", "9000000001", "admin@demo.legalcore.in", [Role.ADMIN])
-    mgr = _user(db, "Kavitha Rao", "9000000002", "manager.hyd@demo.legalcore.in", [Role.BRANCH_MANAGER], ["hyderabad"])
-    _user(db, "Suresh Naidu", "9000000003", "manager.knl@demo.legalcore.in", [Role.BRANCH_MANAGER], ["kurnool"])
-    drafter = _user(db, "Praveen Kumar", "9000000004", "drafting@demo.legalcore.in", [Role.DRAFTING_STAFF], ["hyderabad"])
-    reviewer = _user(db, "Adv. Lakshmi Prasanna", "9000000005", "advocate@demo.legalcore.in", [Role.ADVOCATE_REVIEWER])
-    client = _user(db, "Ramesh Reddy", "9000000006", "client@demo.legalcore.in", [Role.CLIENT])
-    lawyer = _user(db, "Adv. Srinivas Murthy", "9000000007", "lawyer@demo.legalcore.in", [Role.CLIENT, Role.LAWYER])
-    if not lawyer.lawyer_profile:
-        lawyer.lawyer_profile = LawyerProfile(enrolment_number="TS/1234/2012", verification_status="verified")
-    if db.scalar(select(LegalRequest).where(LegalRequest.user_id == client.id)):
-        db.flush()
+    password = os.environ.get("DEMO_PASSWORD") or ""
+    generated = not password
+    if generated:
+        password = secrets.token_urlsafe(12)
+    pw = hash_password(password)
+    existing = db.scalars(select(User).where(User.mobile.like("90000000%"))).all()
+    if existing:
+        # Replace any earlier, published demo password with the current private one.
+        for u in existing:
+            u.password_hash = pw
+            u.token_version += 1
+        rev = next((u for u in existing if u.mobile == "9000000005"), None)
+        if rev and not rev.lawyer_profile:
+            rev.lawyer_profile = LawyerProfile(
+                enrolment_number="DEMO/0000/2010", state_bar_council="Bar Council of Telangana (demo)", verification_status="verified",
+                verified_at=datetime.now(UTC), verification_note="Demo record. Not a real advocate.",
+            )
+        print("Demo users already exist; their password was reset." + (f" New random password: {password}" if generated else ""))
         return
+    admin = _user(db, pw, "Demo Admin", "9000000001", "admin@demo.legalcore.example", [Role.ADMIN])
+    mgr = _user(db, pw, "Kavitha Rao (demo)", "9000000002", "manager.hyd@demo.legalcore.example", [Role.BRANCH_MANAGER], ["hyderabad"])
+    _user(db, pw, "Suresh Naidu (demo)", "9000000003", "manager.knl@demo.legalcore.example", [Role.BRANCH_MANAGER], ["kurnool"])
+    drafter = _user(db, pw, "Praveen Kumar (demo)", "9000000004", "drafting@demo.legalcore.example", [Role.DRAFTING_STAFF], ["hyderabad"])
+    reviewer = _user(db, pw, "Adv. Lakshmi Prasanna (demo)", "9000000005", "advocate@demo.legalcore.example", [Role.ADVOCATE_REVIEWER])
+    reviewer.lawyer_profile = LawyerProfile(
+        enrolment_number="DEMO/0000/2010", state_bar_council="Bar Council of Telangana (demo)", verification_status="verified",
+        verified_at=datetime.now(UTC), verified_by_id=admin.id, verification_note="Demo record. Not a real advocate.",
+        practice_location="Hyderabad", experience_areas="Civil, property, contracts", availability="available",
+    )
+    client = _user(db, pw, "Ramesh Reddy (demo)", "9000000006", "client@demo.legalcore.example", [Role.CLIENT])
+    lawyer = _user(db, pw, "Adv. Srinivas Murthy (demo)", "9000000007", "lawyer@demo.legalcore.example", [Role.CLIENT, Role.LAWYER])
+    lawyer.lawyer_profile = LawyerProfile(enrolment_number="DEMO/1234/2012", verification_status="pending")
+    _user(db, pw, "Anita Desai (demo)", "9000000008", "support@demo.legalcore.example", [Role.SUPPORT_STAFF])
+    biz = _user(db, pw, "Meena Traders (demo)", "9000000009", "business@demo.legalcore.example", [Role.CLIENT, Role.BUSINESS_CLIENT])
+
     svc = {s.slug: s for s in db.scalars(select(Service))}
     br = {b.slug: b for b in db.scalars(select(Branch))}
+    soon = india_today() + timedelta(days=10)
 
     def req(user, aud, s, b, status, msg, **kw):
         r = LegalRequest(
-            request_number=new_request_number(br[b].code), user_id=user.id, audience=aud, service_id=svc[s].id, branch_id=br[b].id,
-            status=status, contact_name=user.name, contact_phone=user.mobile, contact_email=user.email or "", message=msg, **kw,
+            request_number=new_request_number(), user_id=user.id, audience=aud, service_id=svc[s].id, branch_id=br[b].id if b else None,
+            status=status, contact_name=user.name, contact_phone=user.mobile, contact_email=user.email or "", message=msg, needed_by=soon, **kw,
         )
-        path = [Status.SUBMITTED, Status.UNDER_REVIEW, Status.ACCEPTED, Status.ASSIGNED, Status.IN_PROGRESS, Status.QUALITY_REVIEW, Status.APPROVED, Status.COMPLETED]
+        path = [Status.SUBMITTED, Status.UNDER_SCREENING, Status.ASSIGNED, Status.IN_PROGRESS, Status.QUALITY_REVIEW, Status.COMPLETED]
         prev = None
         for st in path[: path.index(status) + 1] if status in path else [Status.SUBMITTED, status]:
             r.history.append(RequestHistory(old_status=prev, new_status=st.value, changed_by_id=admin.id))
@@ -120,18 +164,26 @@ def seed_demo(db) -> None:
         db.add(r)
         return r
 
-    req(client, Audience.INDIVIDUAL, "advocate-consultation", "hyderabad", Status.UNDER_REVIEW,
-        "My neighbour has built a wall on part of my plot. I have the sale deed and pattadar passbook.", topic="Land / property", preferred_contact="Phone call")
-    req(client, Audience.INDIVIDUAL, "legal-notices", "hyderabad", Status.SUBMITTED,
-        "A cheque for Rs 1,50,000 given to me bounced last week. I have the bank return memo.", topic="Money / cheque")
+    req(client, Audience.INDIVIDUAL, "advocate-consultation", "hyderabad", Status.UNDER_SCREENING,
+        "DEMO: A neighbour has built a wall on part of my plot. I have the sale deed and pattadar passbook.", topic="Land / property", preferred_contact="Phone call")
+    req(client, Audience.INDIVIDUAL, "legal-notices", None, Status.SUBMITTED,
+        "DEMO: A cheque given to me was returned unpaid last week. I have the bank return memo.", topic="Money / cheque")
     r = req(lawyer, Audience.LAWYER, "case-drafting", "hyderabad", Status.IN_PROGRESS,
-            "Need a written statement in a suit for declaration and injunction. Plaint copy attached at branch.",
-            enrolment_number="TS/1234/2012", court="Junior Civil Judge, Ranga Reddy District", case_number="O.S. No. 412 of 2026")
-    r.assignments += [RequestAssignment(assignee_id=drafter.id, assigned_by_id=mgr.id), RequestAssignment(assignee_id=reviewer.id, assigned_by_id=mgr.id)]
+            "DEMO: Need a written statement in a suit for declaration and injunction.",
+            enrolment_number="DEMO/1234/2012", court="Junior Civil Judge (demo court)", case_number="O.S. No. 000 of 2026", priority=Priority.HIGH)
+    r.assignments += [
+        RequestAssignment(assignee_id=drafter.id, assigned_by_id=mgr.id, conflict_checked=True),
+        RequestAssignment(assignee_id=reviewer.id, assigned_by_id=mgr.id, conflict_checked=True),
+    ]
     req(lawyer, Audience.LAWYER, "legal-research", "kurnool", Status.COMPLETED,
-        "Research on limitation for filing a revision against an interlocutory order.", enrolment_number="TS/1234/2012", court="High Court of Andhra Pradesh")
+        "DEMO: Research on limitation for filing a revision against an interlocutory order.", enrolment_number="DEMO/1234/2012")
+    req(biz, Audience.BUSINESS, "employment-documentation", None, Status.SUBMITTED,
+        "DEMO: We need an appointment letter template and a simple leave policy for 12 staff.", organisation="Meena Traders (demo)")
     db.flush()
-    print(f"Demo users added. Password for all: {DEMO_PASSWORD}")
+    if generated:
+        print(f"Demo users added with a random password (not stored anywhere else): {password}")
+    else:
+        print("Demo users added. Password is the DEMO_PASSWORD you set.")
 
 
 def main() -> None:

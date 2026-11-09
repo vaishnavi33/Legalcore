@@ -20,7 +20,26 @@ class Settings(BaseSettings):
 
     upload_dir: Path = Path("./uploads")
     max_upload_mb: int = 10
-    max_files_per_request: int = 5
+    max_files_per_request: int = 10
+    # Optional virus scanning through a ClamAV daemon (clamd). Without it, files are marked "not scanned".
+    clamd_host: str = ""
+    clamd_port: int = 3310
+
+    # Demo mode: shows a warning banner and, only when no SMS/email provider is set up, shows one-time codes on screen.
+    demo_mode: bool = False
+
+    # Notifications. Leave blank when not configured; the system then records "not configured" instead of pretending.
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
+    smtp_starttls: bool = True
+    sms_provider: str = ""  # not yet integrated; reserved for an Indian SMS gateway (DLT-registered templates)
+    whatsapp_provider: str = ""  # not yet integrated; reserved for WhatsApp Business API
+    otp_minutes: int = 10
+    otp_max_attempts: int = 5
+    track_session_minutes: int = 30
 
     # First super admin, created by `python -m app.seed` if no admin exists yet.
     admin_email: str = "admin@legalcore.in"
@@ -31,6 +50,7 @@ class Settings(BaseSettings):
     rate_limit_login_per_min: int = 10
     rate_limit_track_per_min: int = 20
     rate_limit_create_per_min: int = 10
+    rate_limit_otp_per_hour: int = 6
 
     @field_validator("database_url")
     @classmethod
@@ -45,10 +65,16 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.environment == "production"
 
+    @property
+    def email_configured(self) -> bool:
+        return bool(self.smtp_host and self.smtp_from)
+
 
 @lru_cache
 def get_settings() -> Settings:
     s = Settings()
     if s.is_production and (s.secret_key.startswith("change-me") or len(s.secret_key) < 32):
         raise RuntimeError("SECRET_KEY must be set to a long random value in production")
+    if s.is_production and s.demo_mode:
+        raise RuntimeError("DEMO_MODE cannot be switched on in production")
     return s

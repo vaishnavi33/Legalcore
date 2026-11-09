@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
-from app.api import admin, auth, catalog, requests, track
+from app.api import admin, auth, catalog, notifications, requests, track
 from app.core.config import get_settings
 from app.core.db import engine
 
@@ -11,7 +11,7 @@ settings = get_settings()
 
 app = FastAPI(
     title="Legal Core API",
-    version="1.0.0",
+    version="2.0.0",
     docs_url=None if settings.is_production else "/api/docs",
     openapi_url=None if settings.is_production else "/api/openapi.json",
 )
@@ -37,6 +37,9 @@ async def security(request: Request, call_next):
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    if settings.cookie_secure:
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
     if request.url.path.startswith("/api/") and "cache-control" not in response.headers:
         response.headers["Cache-Control"] = "no-store"
     return response
@@ -46,6 +49,8 @@ v1 = APIRouter(prefix="/api/v1")
 v1.include_router(auth.router)
 v1.include_router(catalog.router)
 v1.include_router(requests.router)
+v1.include_router(requests.files_router)
+v1.include_router(notifications.router)
 v1.include_router(track.router)
 v1.include_router(admin.router)
 app.include_router(v1)
