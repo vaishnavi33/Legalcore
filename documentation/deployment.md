@@ -43,7 +43,7 @@ legalcore.in, www.legalcore.in {
 ## 4. After the first sign-in
 
 1. Sign in with `ADMIN_EMAIL`.
-2. Under **Branches and fees**, add each branch's address, phone and email, and each service's fee.
+2. Under **Admin, Branches**, add each branch's confirmed address, phone, email, hours and status (operational office, service area or planned). Leave anything unconfirmed empty.
 3. Under **People and roles**, add branch managers, drafting staff and advocate reviewers, and pick their branches.
 
 ## Backups

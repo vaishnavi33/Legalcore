@@ -5,6 +5,8 @@ export ENVIRONMENT="${ENVIRONMENT:-preview}"
 export DATABASE_URL="${DATABASE_URL:-sqlite:///${DATA_DIR:-/data}/legalcore.db}"
 export UPLOAD_DIR="${UPLOAD_DIR:-${DATA_DIR:-/data}/uploads}"
 export COOKIE_SECURE="${COOKIE_SECURE:-true}"
+# The preview always uses fictional data and shows the demo banner.
+export DEMO_MODE="${DEMO_MODE:-true}"
 if [ -z "$SECRET_KEY" ]; then
   # A fresh key on each start signs everyone out after a restart, which is fine for a preview.
   export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(48))')"

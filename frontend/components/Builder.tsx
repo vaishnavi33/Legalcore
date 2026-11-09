@@ -2,33 +2,41 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { BRANCHES } from "@/lib/content";
+import type { Aud } from "@/lib/content";
 
-// "I am [a lawyer] and I need [case drafting] in [Hyderabad]" → the right page, with the branch already chosen.
-const NEEDS: Record<"lawyer" | "individual", [string, string][]> = {
+// "I am [a lawyer] and I need [case drafting]" → the right form. No branch choice: staff allocate requests internally.
+const NEEDS: Record<Aud, [string, string][]> = {
+  individual: [
+    ["a legal opinion from an advocate", "/individuals/legal-opinion"],
+    ["to speak to an advocate", "/individuals/consultation"],
+    ["to send or reply to a legal notice", "/individuals/legal-notice"],
+    ["an agreement drafted", "/individuals/agreement"],
+    ["help with property papers", "/individuals/property"],
+    ["a document reviewed", "/individuals/document-review"],
+    ["help, but I am not sure what", "/individuals/legal-query"],
+    ["to track a request", "/track-request"],
+  ],
   lawyer: [
     ["a case drafted", "/lawyers/drafting"],
     ["legal research", "/lawyers/research"],
     ["documents prepared", "/lawyers/documents"],
-    ["an agreement drafted", "/services/agreement-drafting"],
-    ["a legal notice", "/services/legal-notices"],
+    ["case preparation support", "/lawyers/case-preparation"],
+    ["a document reviewed", "/lawyers/document-review"],
     ["to track a request", "/track-request"],
   ],
-  individual: [
-    ["legal advice", "/individuals/consultation"],
-    ["to ask a question", "/individuals/legal-query"],
-    ["help with my documents", "/individuals/documents"],
-    ["an agreement drafted", "/services/agreement-drafting"],
-    ["to send a legal notice", "/services/legal-notices"],
-    ["an affidavit or deed", "/services/legal-documentation"],
-    ["to track a request", "/track-request"],
+  business: [
+    ["a business agreement", "/businesses/agreements"],
+    ["a contract drafted", "/businesses/contracts"],
+    ["employment documents", "/businesses/employment"],
+    ["a legal notice", "/businesses/legal-notice"],
+    ["ongoing legal support", "/businesses/support"],
+    ["something else", "/businesses/other"],
   ],
 };
 
 export default function Builder() {
-  const [who, setWho] = useState<"lawyer" | "individual">("individual");
+  const [who, setWho] = useState<Aud>("individual");
   const [need, setNeed] = useState(NEEDS.individual[0][1]);
-  const [branch, setBranch] = useState("");
   const router = useRouter();
 
   return (
@@ -36,24 +44,24 @@ export default function Builder() {
       className="builder"
       onSubmit={(e) => {
         e.preventDefault();
-        const sep = need.includes("?") ? "&" : "?";
-        router.push(branch && need !== "/track-request" ? `${need}${sep}branch=${branch}${need.startsWith("/services/") ? "#request" : ""}` : need);
+        router.push(need);
       }}
     >
-      <span className="label">Tell us in one line</span>
+      <span className="label">Find the right service</span>
       <div className="sentence">
         <span>I am</span>
         <select
           aria-label="I am"
           value={who}
           onChange={(e) => {
-            const w = e.target.value as "lawyer" | "individual";
+            const w = e.target.value as Aud;
             setWho(w);
             setNeed(NEEDS[w][0][1]);
           }}
         >
-          <option value="individual">someone who needs help</option>
+          <option value="individual">an individual</option>
           <option value="lawyer">a lawyer</option>
+          <option value="business">a business</option>
         </select>
         <span>and I need</span>
         <select aria-label="I need" value={need} onChange={(e) => setNeed(e.target.value)}>
@@ -63,18 +71,9 @@ export default function Builder() {
             </option>
           ))}
         </select>
-        <span>near</span>
-        <select aria-label="Near branch" value={branch} onChange={(e) => setBranch(e.target.value)}>
-          <option value="">any branch</option>
-          {BRANCHES.map((b) => (
-            <option key={b.slug} value={b.slug}>
-              {b.name}
-            </option>
-          ))}
-        </select>
       </div>
       <button className="btn" type="submit">
-        Take me there →
+        Continue →
       </button>
     </form>
   );

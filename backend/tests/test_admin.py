@@ -97,3 +97,22 @@ def test_conflict_check_flags_same_parties(make_api):
     assert a.post(f"/api/v1/requests/{second}/assign", json={"assignee_id": drafter, "conflict_checked": True}).status_code == 422
     ok = a.post(f"/api/v1/requests/{second}/assign", json={"assignee_id": drafter, "conflict_checked": True, "conflict_note": "Different matter; cleared by manager"})
     assert ok.status_code == 200
+
+
+def test_demo_admin_disabled_unless_enabled(monkeypatch):
+    from sqlalchemy import select
+
+    from app.core.db import SessionLocal
+    from app.models import User
+    from app.seed import seed_demo
+
+    monkeypatch.setenv("DEMO_ADMIN_ENABLED", "false")
+    with SessionLocal() as db:
+        seed_demo(db)  # demo users exist already, so this is the re-run path
+        db.commit()
+        assert db.scalar(select(User).where(User.mobile == "9000000001")).is_active is False
+    monkeypatch.setenv("DEMO_ADMIN_ENABLED", "true")
+    with SessionLocal() as db:
+        seed_demo(db)
+        db.commit()
+        assert db.scalar(select(User).where(User.mobile == "9000000001")).is_active is True

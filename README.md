@@ -1,11 +1,14 @@
 # Legal Core
 
-One platform for Legal Core's six branches (Anantapur, Puttaparthi, Vijayawada, Visakhapatnam, Kurnool and Hyderabad). It serves two kinds of people:
+Legal Core solutions is a legal support and coordination agency operating in India. This repository holds its website and request platform for three kinds of people:
 
-- **Lawyers** send drafting, research and document requests.
-- **Individuals** ask legal questions, get help with documents and book advocate consultations.
+- **Lawyers and advocates** send drafting, research, document and case preparation requests.
+- **Individuals** ask for legal opinions, notices, agreements, property paperwork and advocate consultations.
+- **Businesses and organisations** ask for agreements, contracts, employment documentation and ongoing support.
 
-Everyone uses one sign-in. After signing in, people see the pages and requests that belong to them. Staff see their branch's work queue, and admins see everything.
+It is a managed service, not a marketplace. Registration is optional: guests submit a request, get a reference number and track it with a one-time code. Requests are allocated to a branch internally; people never choose one. Legal opinions, advice and representation are provided only by appropriately qualified advocates.
+
+Everyone uses one sign-in. Staff see their branch's work queue and admins see everything.
 
 | Part | Technology | Folder |
 |---|---|---|
@@ -24,7 +27,7 @@ This sets up the database, API and website on Render's free plan from `render.ya
 
 Alternatively, create one Render **Web Service** from this repository with the **Docker** runtime. The root `Dockerfile` runs the API and website together with a built-in SQLite database. That data resets whenever the service restarts.
 
- It loads the demo accounts below, so use it for trying things out only. Free services sleep when nobody visits, and the first page after a while takes about a minute to load.
+ It loads fictional demo users and shows a demo banner, so use it for trying things out only. Set `DEMO_PASSWORD` in the Render dashboard (never in the repository). Free services sleep when nobody visits, and the first page after a while takes about a minute to load.
 
 ## Run it on your computer
 
@@ -40,7 +43,7 @@ cd backend
 python -m venv .venv && . .venv/bin/activate
 pip install -r requirements-dev.txt
 alembic upgrade head
-ADMIN_PASSWORD='choose-one' python -m app.seed --demo   # --demo adds sample staff and requests
+DEMO_PASSWORD='pick-a-private-one' ADMIN_PASSWORD='choose-one' python -m app.seed --demo   # --demo adds fictional users and requests
 uvicorn app.main:app --reload
 
 # 3. Website (http://localhost:3000)
@@ -49,19 +52,22 @@ npm install
 npm run dev
 ```
 
-### Demo accounts (only with `--demo`; the password for all of them is `Demo@12345`)
+### Demo users (only with `--demo`)
 
-| Who | Sign in with | What they see |
+The demo users are fictional (mobile numbers 9000000001 to 9000000009, emails at `demo.legalcore.example`). Their password is whatever you set in the private `DEMO_PASSWORD` environment variable. If you do not set one, a random password is printed in the server log. Passwords are never written in this repository.
+
+The demo administrator (9000000001) is disabled unless `DEMO_ADMIN_ENABLED=true`. Never enable it on a public site. For your own admin account, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` privately; that super admin signs in with `ADMIN_EMAIL`.
+
+| Who | Mobile | What they see |
 |---|---|---|
-| Admin | 9000000001 | Everything: all branches, people and roles, fees, activity log |
 | Branch manager, Hyderabad | 9000000002 | Hyderabad work queue, assign and transfer, reports, branch details |
 | Branch manager, Kurnool | 9000000003 | Kurnool only |
 | Drafting staff, Hyderabad | 9000000004 | Hyderabad work queue |
-| Advocate reviewer | 9000000005 | Requests assigned to them; the only staff role (with admins) that can approve legal work |
-| Client | 9000000006 | Their own requests |
-| Lawyer | 9000000007 | Their own requests, plus lawyer request options |
-
-The super admin you created with `ADMIN_PASSWORD` signs in with `ADMIN_EMAIL` (default `admin@legalcore.in`).
+| Advocate reviewer (verified, demo) | 9000000005 | Matters assigned for advocate review; the only role that can complete advocate review |
+| Individual client | 9000000006 | Their own requests |
+| Lawyer (enrolment pending) | 9000000007 | Their own requests and lawyer request options |
+| Support staff | 9000000008 | Unallocated requests; allocates them to branches |
+| Business client | 9000000009 | Their organisation's requests |
 
 ## Tests
 
@@ -75,8 +81,14 @@ GitHub Actions runs the backend tests against PostgreSQL and type-checks and bui
 
 ## Common changes
 
-- **Branch address, phone and hours.** Branch managers and admins change these in the dashboard under Branch details. No code change is needed.
-- **Service fees.** Admins change these in the dashboard under Branches and fees.
-- **Head office phone, email and WhatsApp.** Set `NEXT_PUBLIC_CONTACT_*` in `.env`.
-- **Service descriptions, FAQs, Knowledge Centre guides and search keywords.** Edit `frontend/lib/content.ts`.
-- **Staff accounts and roles.** Admins manage these in the dashboard under People and roles.
+- **Branch address, phone, hours and status.** Admins and branch managers change these in Admin, Branches. Empty fields show "Not yet published" on the website. Only publish real, confirmed details.
+- **Services.** Admins rename, switch off or add an internal fee note in Admin, Services. Fees are never shown publicly.
+- **Advocate verification.** Admins check enrolment numbers against the State Bar Council roll in Admin, Advocate verification. A submitted number is never treated as proof.
+- **Head office contact and grievance officer.** Set `NEXT_PUBLIC_CONTACT_*` and `NEXT_PUBLIC_GRIEVANCE_*` (see `.env.example`).
+- **Email, virus scanning.** Set `SMTP_*` and `CLAMD_HOST`. Admin, System shows what is set up and logs every notification attempt with its real result.
+- **Knowledge Centre articles.** Edit `frontend/lib/articles.ts`. Articles show "Awaiting review by a qualified advocate" until `reviewedBy` is filled in.
+- **Staff accounts and roles.** Admin, People and roles.
+
+## Not built yet
+
+SMS and WhatsApp sending (no provider connected), two-factor sign-in for staff, password reset by SMS or email, editing Knowledge Centre articles from the admin screens, cloud file storage (S3), and AI drafting help.

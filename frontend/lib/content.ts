@@ -1,134 +1,266 @@
-// Website text that does not change often. Fees, branch addresses and phone numbers come from the API,
-// so branch managers and admins can update them from the dashboard without a code change.
+import { ARTICLES } from "./articles";
 
-export type Who = "lawyer" | "individual" | "both";
+// Website text that does not change often. Branch addresses and phone numbers come from the API, so administrators
+// can update them without a code change. Nothing here promises timelines or outcomes: those are confirmed after screening.
+
+export type Aud = "lawyer" | "individual" | "business";
+
+export const AUDIENCES: { key: Aud; label: string; short: string; path: string }[] = [
+  { key: "individual", label: "Individual", short: "I need legal help for myself or my family", path: "/individuals" },
+  { key: "lawyer", label: "Lawyer or advocate", short: "I am a lawyer and need support on a matter", path: "/lawyers" },
+  { key: "business", label: "Business or organisation", short: "I need legal support for a business", path: "/businesses" },
+];
 
 export interface ServiceInfo {
   slug: string;
   name: string;
-  who: Who;
+  who: Aud[];
   short: string;
   includes: string[];
   eligibility: string;
   keepReady: string[];
-  time: string;
   faq: [string, string][];
   keywords: string[];
+  advocate?: boolean; // handled by a qualified advocate
 }
+
+const L: Aud = "lawyer";
+const I: Aud = "individual";
+const B: Aud = "business";
 
 export const SERVICES: ServiceInfo[] = [
   {
     slug: "case-drafting",
     name: "Case Drafting",
-    who: "lawyer",
-    short: "Plaints, written statements, writ petitions, appeals and bail applications, drafted to court format.",
-    includes: ["Plaints and suits", "Written statements and counter affidavits", "Writ petitions and appeals", "Bail and anticipatory bail applications", "Interlocutory applications"],
-    eligibility: "Enrolled advocates and law firms. You remain counsel on record and file the final draft.",
-    keepReady: ["Brief facts and chronology", "Copies of existing pleadings or orders", "Court and case number, if filed", "Your deadline"],
-    time: "2 to 5 working days, depending on length",
+    who: [L],
+    short: "Drafting support for plaints, written statements, petitions, appeals and applications, prepared to your instructions.",
+    includes: ["Plaints and suits", "Written statements and counters", "Writ petitions and appeals", "Bail and anticipatory bail applications", "Interlocutory applications"],
+    eligibility: "Advocates and law firms. You remain counsel on record and settle, sign and file the final draft.",
+    keepReady: ["Brief facts and chronology", "Existing pleadings, orders or notices", "Court and case number, if filed", "Any deadline, mentioned in the description"],
     faq: [
-      ["Who signs the draft?", "You do. We prepare it; you review, edit and sign as counsel on record."],
-      ["Can you match my court's format?", "Yes. Tell us the court and we follow its filing format and page rules."],
-      ["Is my client's information safe?", "Case papers are seen only by the team assigned to your request."],
+      ["Who signs the draft?", "You do. Legal Core prepares a draft to your instructions; you review, edit and sign it as counsel on record."],
+      ["Can the draft follow my court's format?", "Yes. Tell us the court and any local practice requirements in your request."],
+      ["Who sees my client's papers?", "Only the Legal Core team members assigned to your request."],
     ],
     keywords: ["draft", "drafting", "plaint", "suit", "written statement", "counter", "writ", "petition", "appeal", "bail", "anticipatory", "pleading", "interlocutory", "ia", "revision"],
   },
   {
     slug: "legal-research",
     name: "Legal Research",
-    who: "lawyer",
-    short: "Case-law and statute research with citations you can check, summarised for your issue.",
-    includes: ["Judgments on a specific legal point", "Statute and amendment history", "Research memo with citations", "Comparison of conflicting rulings"],
-    eligibility: "Enrolled advocates, law firms and in-house legal teams.",
+    who: [L],
+    short: "Research on statutes and case law for a specific legal question, with sources you can check.",
+    includes: ["Judgments on a specific legal point", "Statute and amendment history", "Research note with sources", "Comparison of differing rulings"],
+    eligibility: "Advocates, law firms and in-house legal teams.",
     keepReady: ["The exact legal question", "Relevant facts", "Court or jurisdiction"],
-    time: "2 to 4 working days",
     faq: [
-      ["Are citations verified?", "Every citation is checked against the reported judgment before it reaches you."],
-      ["Do you cover both AP and Telangana High Courts?", "Yes, along with Supreme Court rulings that apply."],
+      ["Will I get the sources?", "Yes. Research notes list the judgments and provisions relied on, so you can verify them yourself before use."],
+      ["Which courts are covered?", "Tell us the forum. Research can cover the Supreme Court and the High Courts relevant to your matter."],
     ],
     keywords: ["research", "case law", "judgment", "judgement", "citation", "precedent", "statute", "memo", "ruling"],
   },
   {
+    slug: "case-preparation",
+    name: "Case Preparation Assistance",
+    who: [L],
+    short: "Help organising case papers: chronologies, lists of dates, document indexes and compilations.",
+    includes: ["Chronology and list of dates", "Document index and paginated compilations", "Summaries of evidence or depositions", "Checklists for filing"],
+    eligibility: "Advocates and law firms.",
+    keepReady: ["Case papers you want organised", "Court and next hearing date, if any", "What you need prepared"],
+    faq: [["Do you appear in court?", "No. Legal Core provides preparation support only. Appearance and representation remain with the advocate on record."]],
+    keywords: ["chronology", "list of dates", "compilation", "index", "paper book", "preparation", "brief"],
+  },
+  {
     slug: "legal-documentation",
     name: "Legal Documentation",
-    who: "both",
-    short: "Affidavits, vakalats, sale deeds, wills, gift deeds and other everyday legal papers.",
-    includes: ["Affidavits and declarations", "Sale, gift and settlement deeds", "Wills", "Power of attorney", "Vakalat and court forms"],
-    eligibility: "Anyone. Lawyers and individuals can both request documents.",
-    keepReady: ["ID proof of the people involved", "Property or account details, if any", "Any old documents linked to this one"],
-    time: "1 to 3 working days",
+    who: [L, I, B],
+    short: "Affidavits, deeds, powers of attorney and other legal documents, prepared from your details.",
+    includes: ["Affidavits and declarations", "Sale, gift and settlement deeds", "Wills", "Powers of attorney", "Board resolutions and authorisations"],
+    eligibility: "Lawyers, individuals and businesses.",
+    keepReady: ["Identity details of the people involved", "Property or account details, if any", "Earlier documents linked to this one"],
     faq: [
-      ["Do you register documents?", "We prepare them and tell you exactly what to take to the Sub-Registrar office."],
-      ["Can I get it in Telugu?", "Yes, documents can be prepared in English or Telugu."],
+      ["Do you register documents?", "Legal Core prepares documents. Where registration is needed, we explain what the Sub-Registrar office will ask for."],
+      ["Can documents be prepared in Telugu?", "Yes, documents can be prepared in English or Telugu."],
     ],
-    keywords: ["affidavit", "vakalat", "sale deed", "deed", "will", "gift", "settlement", "power of attorney", "gpa", "spa", "documentation", "document"],
+    keywords: ["affidavit", "vakalat", "sale deed", "deed", "will", "gift", "settlement", "power of attorney", "gpa", "spa", "documentation", "document", "resolution"],
   },
   {
     slug: "agreement-drafting",
     name: "Agreement Drafting",
-    who: "both",
-    short: "Rental, partnership, employment, business and loan agreements, written in clear terms.",
-    includes: ["Rental and lease agreements", "Partnership deeds", "Employment and service contracts", "Business and vendor agreements", "Loan and settlement agreements"],
+    who: [L, I, B],
+    short: "Rental, partnership, service, loan and settlement agreements written in clear terms.",
+    includes: ["Rental and lease agreements", "Partnership deeds", "Service agreements", "Loan and settlement agreements", "Memorandums of understanding"],
     eligibility: "Individuals, businesses and lawyers.",
     keepReady: ["Names and addresses of all parties", "Key terms: amount, period, conditions", "Any draft you already have"],
-    time: "1 to 3 working days",
     faq: [
-      ["Is stamp duty included?", "No. We tell you the stamp duty that applies; you pay it when the agreement is signed."],
-      ["Can you review an agreement someone gave me?", "Yes. Choose this service and attach the agreement."],
+      ["Is stamp duty included?", "No. Stamp duty depends on the document and the state. We tell you what applies; it is paid when the document is executed."],
+      ["Can you review an agreement someone gave me?", "Yes. Choose Document Review and attach the agreement."],
     ],
-    keywords: ["agreement", "contract", "rent", "rental", "lease", "partnership", "employment", "loan", "mou", "vendor", "business"],
+    keywords: ["agreement", "contract", "rent", "rental", "lease", "partnership", "loan", "mou", "settlement"],
   },
   {
     slug: "legal-notices",
-    name: "Legal Notices",
-    who: "both",
-    short: "Legal notices and replies for cheque bounce, money recovery, property, tenancy and more.",
-    includes: ["Cheque bounce notices", "Money recovery notices", "Property and tenancy notices", "Consumer complaint notices", "Replies to notices you received"],
-    eligibility: "Anyone. Notices for individuals are sent through an advocate.",
-    keepReady: ["Copy of the cheque, bill or agreement", "Dates of key events", "Full address of the other party"],
-    time: "1 to 2 working days",
+    name: "Legal Notice Assistance",
+    who: [L, I, B],
+    short: "Legal notices and replies for money recovery, cheque dishonour, property, tenancy and other disputes.",
+    includes: ["Cheque dishonour notices", "Money recovery notices", "Property and tenancy notices", "Consumer notices", "Replies to notices you have received"],
+    eligibility: "Anyone. Notices for individuals and businesses are issued through a qualified advocate.",
+    keepReady: ["Copy of the cheque, bill or agreement", "Dates of key events", "Full address of the other party", "Any notice you received, with the envelope"],
+    advocate: true,
     faq: [
-      ["I received a notice. What now?", "Do not ignore it. Note the date you received it and send us a copy. Most notices give a fixed time to reply."],
-      ["Is there a time limit for cheque bounce?", "Yes. The notice must be sent within 30 days of the bank's return memo. Contact us quickly."],
+      ["I received a notice. What now?", "Do not ignore it. Note the date you received it, keep the envelope and send us a copy. Many notices give a fixed time to reply."],
+      ["Are there time limits?", "Some notices have strict statutory time limits, for example in cheque dishonour cases. Mention any dates clearly in your request."],
     ],
     keywords: ["notice", "legal notice", "cheque", "check", "bounce", "recovery", "money", "dues", "tenant", "eviction", "reply"],
   },
   {
     slug: "document-assistance",
     name: "Document Assistance",
-    who: "individual",
-    short: "Help reading, checking and organising your legal papers before you sign or submit them.",
-    includes: ["Explaining a document in simple words", "Checking land papers before buying", "Organising papers for a court case", "Filling government and court forms"],
+    who: [I],
+    short: "Help reading, organising and completing legal and government papers.",
+    includes: ["Explaining a document in simple words", "Organising papers for a matter", "Filling government and court forms"],
     eligibility: "Individuals and families.",
-    keepReady: ["The documents you want checked", "What you plan to do (buy, sign, submit)"],
-    time: "1 to 2 working days",
+    keepReady: ["The documents you need help with", "What you plan to do (sign, submit, file)"],
+    faq: [["Do I need to visit an office?", "No. You can upload clear photos or scans of your papers and speak to us by phone."]],
+    keywords: ["explain", "form", "fill", "papers", "help with documents"],
+  },
+  {
+    slug: "legal-opinion",
+    name: "Legal Opinion",
+    who: [I, B],
+    short: "A written professional opinion from a qualified advocate, after the advocate has reviewed your facts and documents.",
+    includes: ["Opinion on rights and options in a dispute", "Opinion on a property's papers", "Opinion on an agreement or proposed transaction", "Opinion on a notice you received"],
+    eligibility: "Individuals and businesses. Opinions are given only by qualified advocates.",
+    keepReady: ["A clear description of the facts", "All related documents", "The specific questions you want answered"],
+    advocate: true,
     faq: [
-      ["Can you explain in Telugu?", "Yes. Ask for Telugu when we call you."],
-      ["Do I need to visit the branch?", "No. You can upload photos of the papers and talk on the phone."],
+      ["Who gives the opinion?", "A qualified advocate who reviews your facts and documents. Legal Core coordinates the request; it does not give the opinion itself."],
+      ["Is the opinion generated by a computer?", "No. Legal Core does not present automated or AI-generated text as an advocate's opinion."],
+      ["Does an opinion guarantee a result?", "No. An opinion is a professional view based on the facts and documents provided. It is not a guarantee of any outcome."],
     ],
-    keywords: ["check papers", "verify", "explain", "form", "fill", "land papers", "title", "encumbrance", "ec", "passbook", "patta"],
+    keywords: ["opinion", "legal opinion", "advice", "view", "rights", "title opinion"],
   },
   {
     slug: "advocate-consultation",
     name: "Advocate Consultation",
-    who: "individual",
-    short: "Speak to a qualified advocate about your problem, in person or on a phone call.",
-    includes: ["Land and property disputes", "Marriage, divorce and maintenance", "Police complaints and FIRs", "Cheque bounce and money recovery", "Job and consumer problems"],
+    who: [I, B],
+    short: "We arrange a consultation with a qualified advocate suited to your matter, in person or by phone.",
+    includes: ["Land and property disputes", "Family matters", "Police complaints and criminal matters", "Money recovery", "Employment and consumer problems"],
     eligibility: "Anyone who needs advice on a legal problem.",
     keepReady: ["A short note on what happened", "Any papers you have, even photos"],
-    time: "Call back within 1 working day",
+    advocate: true,
     faq: [
-      ["Who will I speak to?", "A qualified advocate who handles your type of problem."],
-      ["Can I bring a family member?", "Yes. You can bring anyone you trust."],
+      ["Who will I speak to?", "A qualified advocate. Legal Core arranges the consultation; the advice is the advocate's."],
+      ["Can I bring a family member?", "Yes, you can bring someone you trust."],
     ],
     keywords: ["advocate", "lawyer", "consult", "consultation", "advice", "meet", "appointment", "divorce", "marriage", "maintenance", "custody", "property", "land", "dispute", "police", "fir", "arrest", "job", "consumer"],
   },
+  {
+    slug: "legal-query",
+    name: "Legal Consultation Coordination",
+    who: [I, B],
+    short: "Not sure what you need? Describe your situation and we will work out the right service and professional.",
+    includes: ["Understanding your requirement", "Identifying the documents needed", "Arranging the right professional or advocate"],
+    eligibility: "Anyone.",
+    keepReady: ["A short description of your situation", "Any papers you have"],
+    advocate: true,
+    faq: [["Will you give me legal advice?", "Legal advice is given only by qualified advocates. Our team helps route your matter to the right person."]],
+    keywords: ["question", "query", "ask", "help", "problem", "doubt", "not sure", "సహాయం", "సలహా"],
+  },
+  {
+    slug: "property-documentation",
+    name: "Property Documentation Assistance",
+    who: [I],
+    short: "Help gathering and organising land and property papers, and preparing property-related documents.",
+    includes: ["Collecting and organising title papers", "Preparing applications for records", "Drafting property-related documents", "Arranging title verification by an advocate"],
+    eligibility: "Individuals and families.",
+    keepReady: ["Sale deeds and earlier title documents", "Encumbrance certificate, if available", "Revenue records and tax receipts", "Survey and boundary details"],
+    faq: [["Is this a title investigation?", "No. A title investigation and opinion must be done by a qualified advocate. Choose Legal Opinion if you need one."]],
+    keywords: ["land", "plot", "property", "encumbrance", "ec", "survey", "title", "patta", "passbook", "mutation", "registration"],
+  },
+  {
+    slug: "case-documentation",
+    name: "Case-related Documentation",
+    who: [I],
+    short: "Help organising the papers for a case you are part of, so your advocate has what they need.",
+    includes: ["Collecting and indexing case papers", "Preparing a list of dates", "Copies and translations of documents"],
+    eligibility: "Individuals who are part of a court case or proceeding.",
+    keepReady: ["Court papers you have", "Name of your advocate, if any", "Next hearing date, if any"],
+    faq: [["Will Legal Core represent me?", "No. Representation in court is by an advocate. Legal Core can help coordinate."]],
+    keywords: ["case papers", "court case", "hearing", "summons", "court documents"],
+  },
+  {
+    slug: "document-review",
+    name: "Document Review",
+    who: [L, I, B],
+    short: "Review of an agreement, notice or other document, with points to consider before you sign or respond.",
+    includes: ["Agreements and contracts", "Notices received", "Draft deeds", "Policies and terms"],
+    eligibility: "Lawyers, individuals and businesses.",
+    keepReady: ["The document to be reviewed", "What you plan to do with it", "Any concerns you already have"],
+    faq: [["Is a review the same as a legal opinion?", "No. For a professional legal opinion, choose Legal Opinion, which is given by a qualified advocate."]],
+    keywords: ["review", "check", "vet", "verify", "read", "before signing"],
+  },
+  {
+    slug: "business-agreements",
+    name: "Business Agreements",
+    who: [B],
+    short: "Vendor, supplier, distribution, service and partnership agreements for your business.",
+    includes: ["Vendor and supplier agreements", "Distribution and agency agreements", "Service agreements", "Partnership and LLP agreements", "Non-disclosure agreements"],
+    eligibility: "Businesses, firms, companies and organisations.",
+    keepReady: ["Names and registration details of the parties", "Commercial terms agreed", "Any existing draft or earlier agreement"],
+    faq: [["Can you work from our template?", "Yes. Attach your template and tell us what needs to change."]],
+    keywords: ["vendor", "supplier", "distribution", "agency", "nda", "business agreement", "llp"],
+  },
+  {
+    slug: "contract-drafting",
+    name: "Contract Drafting Assistance",
+    who: [B],
+    short: "Drafting and redrafting of commercial contracts to your agreed terms.",
+    includes: ["New contracts from agreed terms", "Redrafting and clean-up of existing contracts", "Schedules and annexures", "Amendment agreements"],
+    eligibility: "Businesses and organisations.",
+    keepReady: ["Term sheet or summary of agreed terms", "Existing contract, if any", "Deadline, mentioned in the description"],
+    faq: [["Do you negotiate with the other side?", "No. Legal Core supports drafting. Negotiation and advice are for your team or your advocate."]],
+    keywords: ["contract", "commercial", "drafting", "amendment", "terms"],
+  },
+  {
+    slug: "employment-documentation",
+    name: "Employment Documentation",
+    who: [B],
+    short: "Appointment letters, employment agreements, policies and other HR documents.",
+    includes: ["Appointment letters and employment agreements", "Confidentiality and non-solicitation terms", "HR policies", "Relieving and experience letters"],
+    eligibility: "Employers of any size.",
+    keepReady: ["Company details", "Roles and terms of employment", "Existing letters or policies"],
+    faq: [["Will the documents cover labour law compliance?", "Tell us your state and industry. Compliance questions are referred to a qualified advocate."]],
+    keywords: ["employment", "appointment letter", "offer letter", "hr", "policy", "employee", "staff"],
+  },
+  {
+    slug: "business-legal-support",
+    name: "Business Legal Support",
+    who: [B],
+    short: "Ongoing documentation and coordination support for a business's routine legal work.",
+    includes: ["Routine documentation", "Organising legal records", "Coordinating with your advocates", "Tracking notices and replies"],
+    eligibility: "Businesses and organisations.",
+    keepReady: ["A description of the support you need", "Any documents involved"],
+    faq: [["Is this a retainer?", "Tell us what you need. Scope and arrangements are discussed after screening."]],
+    keywords: ["business support", "company", "firm", "startup", "msme", "routine", "compliance"],
+  },
+  {
+    slug: "other",
+    name: "Other",
+    who: [L, I, B],
+    short: "Need something not listed? Tell us what you require and our team will review it.",
+    includes: ["Any legal support or documentation requirement not listed elsewhere"],
+    eligibility: "Lawyers, individuals and businesses.",
+    keepReady: ["A clear description of what you need", "Any documents you have"],
+    faq: [["Will you accept every request?", "Our team reviews each request and will tell you whether and how we can help."]],
+    keywords: ["other", "something else", "not listed"],
+  },
 ];
 
-export const LEGAL_QUERY = {
-  slug: "legal-query",
-  name: "Legal Query",
-};
+export const LEGAL_QUERY = { slug: "legal-query", name: "Legal Consultation Coordination" };
+
+export function servicesFor(aud: Aud): ServiceInfo[] {
+  return SERVICES.filter((s) => s.who.includes(aud));
+}
 
 export interface BranchInfo {
   slug: string;
@@ -149,67 +281,6 @@ export const BRANCHES: BranchInfo[] = [
 
 export const TOPICS = ["Land / property", "Family / marriage", "Money / cheque", "Police / criminal", "Job / consumer", "Something else"];
 
-export interface Guide {
-  slug: string;
-  title: string;
-  tag: string;
-  steps: string[];
-  keywords: string[];
-}
-
-export const GUIDES: Guide[] = [
-  {
-    slug: "cheque-bounce",
-    title: "My cheque bounced. What should I do?",
-    tag: "Money",
-    steps: [
-      "Keep the bounced cheque and the bank's return memo safely.",
-      "Send a legal notice to the person who gave the cheque within 30 days of getting the bank memo.",
-      "They then have 15 days from receiving the notice to pay.",
-      "If they do not pay, a complaint can be filed in court within one month after those 15 days end.",
-      "These time limits are strict, so act quickly.",
-    ],
-    keywords: ["cheque", "check", "bounce", "dishonour", "138"],
-  },
-  {
-    slug: "legal-notice",
-    title: "What is a legal notice?",
-    tag: "Basics",
-    steps: [
-      "A legal notice is a formal letter that tells the other side what your complaint is and what you want them to do.",
-      "It is usually sent by an advocate before a case is filed.",
-      "It gives the other side a chance to settle without going to court.",
-      "If you receive one, note the date, keep the envelope, and get advice before replying.",
-    ],
-    keywords: ["notice", "legal notice", "received notice"],
-  },
-  {
-    slug: "land-check",
-    title: "Papers to check before buying land",
-    tag: "Property",
-    steps: [
-      "Ask for the full chain of title documents (link documents) going back several years.",
-      "Get an Encumbrance Certificate to see loans or other claims on the property.",
-      "Check the land records on your state's official land records portal and match the survey number and owner name.",
-      "For plots, check layout approval from the local authority.",
-      "Get the papers checked by an advocate before you pay any advance.",
-    ],
-    keywords: ["land", "plot", "buy", "property", "encumbrance", "ec", "survey", "title"],
-  },
-  {
-    slug: "police-complaint",
-    title: "How to file a police complaint (FIR)",
-    tag: "Police",
-    steps: [
-      "Go to the police station and give your complaint in writing or orally. It should be written down and read back to you.",
-      "For a serious offence you can file at any police station, and it will be transferred to the right one (Zero FIR).",
-      "You are entitled to a free copy of the FIR.",
-      "If the police refuse to register it, you can send your complaint in writing to the Superintendent of Police.",
-    ],
-    keywords: ["police", "fir", "complaint", "zero fir", "station", "theft", "cheating", "harassment"],
-  },
-];
-
 export interface SearchEntry {
   title: string;
   href: string;
@@ -218,13 +289,17 @@ export interface SearchEntry {
 }
 
 export const QUICK_LINKS: SearchEntry[] = [
+  { title: "Submit a legal request", href: "/request", hint: "No account needed", keywords: ["submit", "request", "help", "start", "new", "form"] },
   { title: "Submit a drafting request", href: "/lawyers/drafting", hint: "For lawyers", keywords: ["submit draft", "drafting request", "lawyer", "advocate", "counsel"] },
   { title: "Request legal research", href: "/lawyers/research", hint: "For lawyers", keywords: ["research request"] },
-  { title: "Ask a legal question", href: "/individuals/legal-query", hint: "For individuals", keywords: ["question", "query", "ask", "help", "problem", "doubt", "సహాయం", "సలహా"] },
+  { title: "Ask for a legal opinion", href: "/individuals/legal-opinion", hint: "From a qualified advocate", keywords: ["opinion", "advice"] },
+  { title: "Business legal request", href: "/businesses", hint: "For businesses", keywords: ["business", "company", "firm", "employer", "msme", "startup"] },
   { title: "Book an advocate consultation", href: "/individuals/consultation", hint: "For individuals", keywords: ["book", "appointment", "meet", "talk", "consult"] },
-  { title: "Track my request", href: "/track-request", hint: "Check status", keywords: ["track", "status", "where", "request number", "progress"] },
-  { title: "Sign in or create account", href: "/login", hint: "One account for everyone", keywords: ["login", "log in", "sign in", "account", "register", "sign up", "password"] },
-  { title: "Contact us", href: "/contact", hint: "Phone, email, WhatsApp", keywords: ["contact", "phone", "call", "email", "whatsapp", "number"] },
+  { title: "Track my request", href: "/track-request", hint: "Reference number and one-time code", keywords: ["track", "status", "where", "request number", "reference", "progress", "otp"] },
+  { title: "How it works", href: "/how-it-works", hint: "Our process", keywords: ["how", "process", "steps", "works"] },
+  { title: "Sign in or create account", href: "/login", hint: "Optional. One account for everyone", keywords: ["login", "log in", "sign in", "account", "register", "sign up", "password"] },
+  { title: "Contact us", href: "/contact", hint: "Get in touch", keywords: ["contact", "phone", "call", "email", "whatsapp", "number"] },
+  { title: "Privacy notice", href: "/privacy", hint: "How we handle your data", keywords: ["privacy", "data", "dpdp", "delete", "consent", "grievance"] },
 ];
 
 export function searchIndex(): SearchEntry[] {
@@ -233,11 +308,11 @@ export function searchIndex(): SearchEntry[] {
     ...SERVICES.map((s) => ({
       title: s.name,
       href: `/services/${s.slug}`,
-      hint: s.who === "lawyer" ? "Service for lawyers" : s.who === "individual" ? "Service for individuals" : "Service",
+      hint: s.who.length === 1 ? `Service for ${s.who[0] === "lawyer" ? "lawyers" : s.who[0] === "individual" ? "individuals" : "businesses"}` : "Service",
       keywords: [s.name.toLowerCase(), ...s.keywords],
     })),
     ...BRANCHES.map((b) => ({ title: `${b.name} branch`, href: `/locations/${b.slug}`, hint: b.state, keywords: [b.name.toLowerCase(), b.te, b.code.toLowerCase(), "branch", "office", "near", "address", "location"] })),
-    ...GUIDES.map((g) => ({ title: g.title, href: `/knowledge/${g.slug}`, hint: `Guide · ${g.tag}`, keywords: g.keywords })),
+    ...ARTICLES.map((a) => ({ title: a.title, href: `/knowledge/${a.slug}`, hint: `Knowledge Centre · ${a.category}`, keywords: a.keywords })),
   ];
 }
 
@@ -273,29 +348,45 @@ export function branchBySlug(slug: string) {
 }
 
 export const STATUS_LABELS: Record<string, string> = {
-  SUBMITTED: "Request received",
-  UNDER_REVIEW: "Being reviewed",
-  AWAITING_INFORMATION: "Waiting for your information",
-  ACCEPTED: "Accepted",
-  PAYMENT_PENDING: "Waiting for payment",
-  ASSIGNED: "Team assigned",
-  IN_PROGRESS: "Work in progress",
-  QUALITY_REVIEW: "Quality check by advocate",
-  REVISION_REQUESTED: "Changes being made",
-  APPROVED: "Approved",
-  COMPLETED: "Ready for you",
+  SUBMITTED: "Submitted",
+  UNDER_SCREENING: "Under screening",
+  INFORMATION_REQUIRED: "Information required",
+  ASSIGNED: "Assigned",
+  IN_PROGRESS: "In progress",
+  ADVOCATE_REVIEW: "Advocate review",
+  QUALITY_REVIEW: "Quality review",
+  CLIENT_REVIEW: "Client review",
+  REVISION_REQUIRED: "Revision required",
+  COMPLETED: "Completed",
   ON_HOLD: "On hold",
   CANCELLED: "Cancelled",
-  REJECTED: "Not accepted",
-  REFUND_PENDING: "Refund in process",
+};
+
+export const PRIORITY_LABELS: Record<string, string> = {
+  normal: "Normal",
+  high: "High",
+  urgent: "Urgent",
+  deadline_sensitive: "Deadline-sensitive",
+};
+
+export const DOC_KIND_LABELS: Record<string, string> = {
+  original: "Original",
+  under_review: "Under review",
+  draft: "Draft",
+  revised_draft: "Revised draft",
+  advocate_reviewed: "Advocate reviewed",
+  final: "Final",
+  superseded: "Superseded",
 };
 
 export const ROLE_LABELS: Record<string, string> = {
-  client: "Client",
+  client: "Individual client",
   lawyer: "Lawyer",
+  business_client: "Business client",
   drafting_staff: "Drafting staff",
+  support_staff: "Support staff",
   advocate_reviewer: "Advocate reviewer",
   branch_manager: "Branch manager",
-  admin: "Admin",
-  super_admin: "Super admin",
+  admin: "Administrator",
+  super_admin: "Super administrator",
 };

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Crumbs, Steps } from "@/components/Blocks";
-import { FeeText } from "@/components/Live";
 import RequestForm from "@/components/RequestForm";
 import { SERVICES, serviceBySlug } from "@/lib/content";
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return SERVICES.map((s) => ({ slug: s.slug }));
@@ -17,14 +18,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
   const s = serviceBySlug((await params).slug);
   if (!s) notFound();
-  const audience = s.who === "lawyer" ? "lawyer" : "individual";
+  const audience = s.who.includes("individual") ? "individual" : s.who[0];
+  const whoText = s.who.map((w) => (w === "lawyer" ? "lawyers" : w === "individual" ? "individuals" : "businesses")).join(", ").replace(/, ([^,]*)$/, " and $1");
   return (
     <>
       <Crumbs items={[["Legal Services", "/services"], [s.name]]} />
-      <div className="wrap hero">
-        <span className="label">{s.who === "lawyer" ? "For lawyers" : s.who === "individual" ? "For individuals" : "For lawyers and individuals"}</span>
-        <h1>{s.name}</h1>
+      <div className="wrap hero page-head">
+        <span className="label">For {whoText}</span>
+        <h1>{s.name === "Other" ? "Other Services" : s.name}</h1>
         <p className="lead">{s.short}</p>
+        {s.advocate && (
+          <p className="callout">
+            This service is handled by an appropriately qualified advocate. Legal Core coordinates the request and does not itself give legal advice.
+          </p>
+        )}
       </div>
       <section className="blk" style={{ paddingTop: 0 }}>
         <div className="wrap split">
@@ -39,7 +46,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             </div>
             <div>
               <h3 style={{ marginBottom: 14 }}>How it works</h3>
-              <Steps />
+              <Steps short />
             </div>
             <div>
               <h3 style={{ marginBottom: 6 }}>Common questions</h3>
@@ -65,12 +72,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
               </ul>
             </div>
             <div>
-              <span className="label">Usual time</span>
-              <span>{s.time}</span>
-            </div>
-            <div>
-              <span className="label">Fees</span>
-              <FeeText slug={s.slug} />
+              <span className="label">Timing</span>
+              <span>Confirmed by our team after your request is screened.</span>
             </div>
             <Link className="btn" href="#request">
               Request this service
@@ -80,7 +83,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       </section>
       <section className="blk">
         <div className="wrap">
-          <RequestForm audience={audience} service={s.slug} title={`Request ${s.name}`} lockAudience={s.who !== "both"} />
+          <RequestForm audience={audience} service={s.slug} title={s.slug === "other" ? "Tell us what you need" : `Request ${s.name}`} lockAudience={s.who.length === 1} />
         </div>
       </section>
     </>

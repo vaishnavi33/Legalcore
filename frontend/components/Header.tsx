@@ -5,14 +5,30 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { isAdmin, isManager, isStaff } from "@/lib/api";
 import { ROLE_LABELS } from "@/lib/content";
-import { NAV } from "@/lib/nav";
+import { NAV, UTILITY } from "@/lib/nav";
 import { Chevron, Logo, SearchIcon } from "./Icons";
 import SiteSearch from "./SiteSearch";
 import { useUser } from "./UserProvider";
 
-function Dropdown({ id, title, open, onToggle, children, right }: { id: string; title: React.ReactNode; open: boolean; onToggle: () => void; children: React.ReactNode; right?: boolean }) {
+function Dropdown({
+  id,
+  title,
+  open,
+  onToggle,
+  children,
+  right,
+  current,
+}: {
+  id: string;
+  title: React.ReactNode;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+  right?: boolean;
+  current?: boolean;
+}) {
   return (
-    <div className={`dd${open ? " open" : ""}${right ? " right" : ""}`}>
+    <div className={`dd${open ? " open" : ""}${right ? " right" : ""}${current ? " cur" : ""}`}>
       <button type="button" aria-expanded={open} aria-controls={id} onClick={onToggle}>
         {title}
         <Chevron />
@@ -56,19 +72,36 @@ export default function Header() {
     setMenuOpen(false);
   };
 
+  const here = (h: string) => (h === "/" ? pathname === "/" : pathname === h || pathname.startsWith(`${h}/`));
+
   return (
     <header className="site">
       <a className="skip" href="#main">
         Skip to content
       </a>
+      <div className="topbar">
+        <div className="wrap topbar-in">
+          <span className="tagline">Your legal work. Simplified.</span>
+          <nav aria-label="Site">
+            {UTILITY.map(([t, h]) => (
+              <Link key={h} href={h} aria-current={here(h) ? "page" : undefined}>
+                {t}
+              </Link>
+            ))}
+            <Link href="/track-request" aria-current={here("/track-request") ? "page" : undefined}>
+              Track Request
+            </Link>
+          </nav>
+        </div>
+      </div>
       <div className="wrap bar">
         <Link className="brand" href="/" aria-label="Legal Core home">
           <Logo />
-          <b>LEGAL CORE</b>
+          <span>
+            <b>Legal Core</b>
+            <small>Legal support &amp; coordination</small>
+          </span>
         </Link>
-        <div className="searchbar">
-          <SiteSearch placeholder="Search Legal Core" />
-        </div>
         <button className="burger" aria-expanded={menuOpen} aria-controls="menu" onClick={() => setMenuOpen((m) => !m)}>
           {menuOpen ? "Close" : "Menu"}
         </button>
@@ -76,14 +109,22 @@ export default function Header() {
           <div className="mobile-only" style={{ paddingBlock: 6 }} hidden={!menuOpen}>
             <SiteSearch onGo={close} />
           </div>
-          <Link className="search-link" href="/search" aria-label="Search">
-            <SearchIcon />
-          </Link>
-          <Link href="/about" aria-current={pathname === "/about" ? "page" : undefined}>
-            About Us
-          </Link>
+          <div className="mobile-only util" hidden={!menuOpen}>
+            {UTILITY.map(([t, h]) => (
+              <Link key={h} href={h} onClick={close}>
+                {t}
+              </Link>
+            ))}
+          </div>
           {NAV.map((g, i) => (
-            <Dropdown key={g.title} id={`dd${i}`} title={g.title} open={openDd === g.title} onToggle={() => toggle(g.title)}>
+            <Dropdown
+              key={g.title}
+              id={`dd${i}`}
+              title={g.title}
+              open={openDd === g.title}
+              onToggle={() => toggle(g.title)}
+              current={here(g.all[1])}
+            >
               {g.items.map(([t, h]) => (
                 <Link key={t} href={h} onClick={close}>
                   {t}
@@ -94,11 +135,8 @@ export default function Header() {
               </Link>
             </Dropdown>
           ))}
-          <Link href="/knowledge" aria-current={pathname.startsWith("/knowledge") ? "page" : undefined}>
-            Knowledge Centre
-          </Link>
-          <Link href="/contact" aria-current={pathname === "/contact" ? "page" : undefined}>
-            Contact
+          <Link className="search-link" href="/search" aria-label="Search">
+            <SearchIcon />
           </Link>
           {user ? (
             <Dropdown
@@ -125,6 +163,9 @@ export default function Header() {
               <Link href="/dashboard?tab=mine" onClick={close}>
                 My requests
               </Link>
+              <Link href="/dashboard?tab=notifications" onClick={close}>
+                Notifications
+              </Link>
               {isStaff(user) && (
                 <Link href="/dashboard?tab=work" onClick={close}>
                   Work queue
@@ -135,14 +176,9 @@ export default function Header() {
                   Reports
                 </Link>
               )}
-              {isManager(user) && (
-                <Link href="/admin/branches" onClick={close}>
-                  Branch details
-                </Link>
-              )}
               {isAdmin(user) && (
-                <Link href="/admin/users" onClick={close}>
-                  People and roles
+                <Link href="/admin/advocates" onClick={close}>
+                  Advocate verification
                 </Link>
               )}
               <button

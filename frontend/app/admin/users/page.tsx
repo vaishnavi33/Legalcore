@@ -6,7 +6,7 @@ import RequireUser from "@/components/RequireUser";
 import { api, ApiError, isAdmin, type User } from "@/lib/api";
 import { BRANCHES, ROLE_LABELS } from "@/lib/content";
 
-const ASSIGNABLE = ["client", "lawyer", "drafting_staff", "advocate_reviewer", "branch_manager", "admin", "super_admin"];
+const ASSIGNABLE = ["client", "lawyer", "business_client", "drafting_staff", "support_staff", "advocate_reviewer", "branch_manager", "admin", "super_admin"];
 
 function RoleBranchPicker({ roles, branches, setRoles, setBranches, canSuper, idp }: { roles: string[]; branches: string[]; setRoles: (r: string[]) => void; setBranches: (b: string[]) => void; canSuper: boolean; idp: string }) {
   const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -126,10 +126,10 @@ function EditUser({ u, me, onSaved }: { u: User; me: User; onSaved: () => void }
         <button className="btn alt small" onClick={() => save({ roles, branches })}>
           Save roles and branches
         </button>
-        {u.lawyer_status && u.lawyer_status !== "verified" && (
-          <button className="btn ghost small" onClick={() => save({ lawyer_status: "verified" })}>
-            Mark enrolment verified
-          </button>
+        {u.lawyer_status && (
+          <a className="btn ghost small" href="/admin/advocates">
+            Enrolment check
+          </a>
         )}
         {u.id !== me.id && (
           <button className="btn ghost small" onClick={() => save({ is_active: !u.is_active })}>
@@ -160,7 +160,7 @@ function Users({ user }: { user: User }) {
   return (
     <div className="wrap">
       <div className="dash-head">
-        <h1 style={{ fontSize: "clamp(1.9rem,4vw,2.6rem)" }}>People and roles</h1>
+        <h1 className="h-dash">People and roles</h1>
         <AddStaff canSuper={user.roles.includes("super_admin")} onAdded={load} />
       </div>
       <AdminNav user={user} />

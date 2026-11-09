@@ -10,6 +10,7 @@ os.environ["RATE_LIMIT_CREATE_PER_MIN"] = "1000"
 os.environ["RATE_LIMIT_TRACK_PER_MIN"] = "1000"
 os.environ["RATE_LIMIT_OTP_PER_HOUR"] = "1000"
 os.environ["DEMO_PASSWORD"] = "Demo@12345"
+os.environ["DEMO_ADMIN_ENABLED"] = "true"
 os.environ["DEMO_MODE"] = "true"
 
 import pytest  # noqa: E402

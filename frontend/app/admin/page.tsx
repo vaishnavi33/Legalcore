@@ -18,6 +18,12 @@ interface Report {
   by_status: Row[];
   by_branch: Row[];
   by_service: Row[];
+  by_priority: Row[];
+  overdue: number;
+  unallocated: number;
+  workload: { id: string; name: string; roles: string[]; open: number }[];
+  total_users: number | null;
+  pending_verifications: number | null;
 }
 
 function Bars({ rows }: { rows: Row[] }) {
@@ -48,7 +54,7 @@ function Reports({ user }: { user: User }) {
       <div className="dash-head">
         <div style={{ display: "grid", gap: 6 }}>
           <span className="label">{user.roles.includes("admin") || user.roles.includes("super_admin") ? "All branches" : user.branches.map((b) => b.name).join(", ")}</span>
-          <h1 style={{ fontSize: "clamp(1.9rem,4vw,2.6rem)" }}>Reports</h1>
+          <h1 className="h-dash">Reports</h1>
         </div>
       </div>
       <AdminNav user={user} />
@@ -74,6 +80,26 @@ function Reports({ user }: { user: User }) {
               <span className="label">Last 30 days</span>
               <b>{rep.last_30_days}</b>
             </div>
+            <div className="stat">
+              <span className="label">Past required date</span>
+              <b>{rep.overdue}</b>
+            </div>
+            <div className="stat">
+              <span className="label">Waiting for allocation</span>
+              <b>{rep.unallocated}</b>
+            </div>
+            {rep.total_users != null && (
+              <div className="stat">
+                <span className="label">Registered people</span>
+                <b>{rep.total_users}</b>
+              </div>
+            )}
+            {rep.pending_verifications != null && (
+              <div className="stat">
+                <span className="label">Enrolments to verify</span>
+                <b>{rep.pending_verifications}</b>
+              </div>
+            )}
           </div>
           <div className="grid">
             <div className="card">
@@ -83,6 +109,17 @@ function Reports({ user }: { user: User }) {
             <div className="card">
               <h3>By status</h3>
               {rep.by_status.length ? <Bars rows={rep.by_status} /> : <p className="muted">No requests yet.</p>}
+            </div>
+          </div>
+          <div className="grid">
+            <div className="card">
+              <h3>Open matters by priority</h3>
+              <p className="note">Priority is set by staff for internal planning. It is not a legal assessment of the matter.</p>
+              <Bars rows={rep.by_priority} />
+            </div>
+            <div className="card">
+              <h3>Staff workload (open assignments)</h3>
+              {rep.workload.length ? <Bars rows={rep.workload.map((w) => ({ key: w.id, label: w.name, count: w.open }))} /> : <p className="muted">No open assignments.</p>}
             </div>
           </div>
           <div className="card">

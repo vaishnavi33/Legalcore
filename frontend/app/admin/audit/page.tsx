@@ -27,7 +27,7 @@ function Audit({ user }: { user: User }) {
   return (
     <div className="wrap">
       <div className="dash-head">
-        <h1 style={{ fontSize: "clamp(1.9rem,4vw,2.6rem)" }}>Activity log</h1>
+        <h1 className="h-dash">Activity log</h1>
       </div>
       <AdminNav user={user} />
       <div className="filters">

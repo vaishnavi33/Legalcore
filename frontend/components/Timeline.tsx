@@ -23,12 +23,8 @@ export default function Timeline({ steps }: { steps: Step[] }) {
   );
 }
 
-export const PREVIEW_STEPS: Step[] = [
-  "Request received",
-  "Being reviewed",
-  "Accepted",
-  "Team assigned",
-  "Work in progress",
-  "Quality check by advocate",
-  "Ready for you",
-].map((label) => ({ status: label, label, state: "todo" }));
+export const PREVIEW_STEPS: Step[] = ["Submitted", "Under screening", "Assigned", "In progress", "Quality review", "Completed"].map((label) => ({
+  status: label,
+  label,
+  state: "todo",
+}));

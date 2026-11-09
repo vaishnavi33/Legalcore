@@ -4,5 +4,7 @@ export const SITE = {
   phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "",
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "",
   whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || "",
-  hours: "Monday to Saturday, 9:30 am to 6:30 pm",
+  hours: process.env.NEXT_PUBLIC_CONTACT_HOURS || "",
+  grievanceOfficer: process.env.NEXT_PUBLIC_GRIEVANCE_OFFICER || "",
+  grievanceEmail: process.env.NEXT_PUBLIC_GRIEVANCE_EMAIL || "",
 };

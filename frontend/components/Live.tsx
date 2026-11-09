@@ -1,61 +1,96 @@
 "use client";
 
-// Small pieces that read details admins can change (fees, branch addresses) from the API.
+// Small pieces that read details administrators can change (branch details, demo mode) from the API.
 import { useEffect, useState } from "react";
-import { api, type Branch, type Service } from "@/lib/api";
+import { api, type Branch, type PublicConfig } from "@/lib/api";
 
-let servicesCache: Promise<Service[]> | null = null;
 let branchesCache: Promise<Branch[]> | null = null;
-export const loadServices = () => (servicesCache ??= api<Service[]>("/services").catch(() => ((servicesCache = null), [])));
+let configCache: Promise<PublicConfig | null> | null = null;
 export const loadBranches = () => (branchesCache ??= api<Branch[]>("/branches").catch(() => ((branchesCache = null), [])));
+export const loadConfig = () => (configCache ??= api<PublicConfig>("/config").catch(() => ((configCache = null), null)));
 
-export function FeeText({ slug }: { slug: string }) {
-  const [fee, setFee] = useState<string | null>(null);
-  useEffect(() => {
-    loadServices().then((list) => setFee(list.find((s) => s.slug === slug)?.fee_text || ""));
-  }, [slug]);
-  return <span>{fee ? fee : "Fee on request"}. We confirm the fee before starting work.</span>;
-}
+export const OFFICE_STATUS: Record<string, [string, string]> = {
+  operational: ["Office open", "An operational office that you can visit."],
+  service_area: ["Service area", "We serve this area. Requests are handled online and by phone."],
+  planned: ["Planned location", "This location is planned. Requests from this area are handled online and by phone."],
+};
 
-function Ph({ v, f }: { v?: string; f: string }) {
-  return v ? <>{v}</> : <span className="placeholder">{f}</span>;
+function Val({ v }: { v?: string }) {
+  return v ? <>{v}</> : <span className="placeholder">Not yet published</span>;
 }
 
 export function BranchContact({ slug, name, state }: { slug: string; name: string; state: string }) {
   const [b, setB] = useState<Branch | null>(null);
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    loadBranches().then((list) => setB(list.find((x) => x.slug === slug) || null));
+    loadBranches().then((list) => {
+      setB(list.find((x) => x.slug === slug) || null);
+      setLoaded(true);
+    });
   }, [slug]);
-  const mapQ = encodeURIComponent(`${b?.address || ""} ${name}, ${state}`.trim());
+  const st = OFFICE_STATUS[b?.office_status || "planned"];
   return (
-    <div className="card facts">
+    <div className="card facts" aria-busy={!loaded}>
+      <div>
+        <span className="label">Status</span>
+        <span>
+          <span className={`pill ${b?.office_status === "operational" ? "done" : "wait"}`}>{st[0]}</span> <span className="note">{st[1]}</span>
+        </span>
+      </div>
+      {b?.description && (
+        <div>
+          <span className="label">About this location</span>
+          <span>{b.description}</span>
+        </div>
+      )}
       <div>
         <span className="label">Address</span>
         <span>
-          <Ph v={b?.address} f={`Branch address to be added, ${name}, ${state}`} />
+          <Val v={b?.address} />
         </span>
       </div>
       <div>
         <span className="label">Phone</span>
-        <span style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-          <Ph v={b?.phone} f="+91 00000 00000" />
-        </span>
+        <span>{b?.phone ? <a href={`tel:${b.phone.replace(/\s/g, "")}`}>{b.phone}</a> : <Val />}</span>
       </div>
       <div>
         <span className="label">Email</span>
-        <span>
-          <Ph v={b?.email} f={`${slug}@legalcore.in`} />
-        </span>
+        <span>{b?.email ? <a href={`mailto:${b.email}`}>{b.email}</a> : <Val />}</span>
       </div>
       <div>
         <span className="label">Working hours</span>
-        <span>{b?.hours || "Monday to Saturday, 9:30 am to 6:30 pm"}</span>
+        <span>
+          <Val v={b?.hours} />
+        </span>
       </div>
       <div>
-        <span className="label">Directions</span>
-        <a href={`https://www.google.com/maps/search/?api=1&query=${mapQ}`} target="_blank" rel="noopener noreferrer">
-          Open {name} in Google Maps
-        </a>
+        <span className="label">Branch manager</span>
+        <span>
+          <Val v={b?.manager_name} />
+        </span>
+      </div>
+      {b?.address && (
+        <div>
+          <span className="label">Directions</span>
+          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.address}, ${name}, ${state}`)}`} target="_blank" rel="noopener noreferrer">
+            Open in Google Maps
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function DemoBanner() {
+  const [demo, setDemo] = useState(false);
+  useEffect(() => {
+    loadConfig().then((c) => setDemo(!!c?.demo_mode));
+  }, []);
+  if (!demo) return null;
+  return (
+    <div className="demo-banner" role="note">
+      <div className="wrap">
+        <b>Demonstration site.</b> All people and cases shown are fictional. Please do not upload real documents or personal information.
       </div>
     </div>
   );

@@ -61,37 +61,69 @@ export interface User {
   is_active: boolean;
 }
 
+export type Audience = "lawyer" | "individual" | "business";
+
 export interface RequestSummary {
   request_number: string;
   status: string;
   status_label: string;
-  audience: "lawyer" | "individual";
+  priority: string;
+  audience: Audience;
   service: string;
   service_slug: string;
-  branch: string;
-  branch_slug: string;
+  service_other: string;
+  branch: string | null;
+  branch_slug: string | null;
   contact_name: string;
+  needed_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Doc {
+  id: string;
+  filename: string;
+  size: number;
+  kind: string;
+  version: number;
+  shared_with_client: boolean;
+  scan_status: string;
+  uploaded_by: string | null;
+  from_requester: boolean;
+  at: string;
+}
+
+export interface History {
+  old_status: string | null;
+  new_status: string;
+  label: string;
+  note: string;
+  internal_note: string;
+  at: string;
+  by: string | null;
 }
 
 export interface RequestDetail extends RequestSummary {
   contact_phone: string;
   contact_email: string;
+  organisation: string;
   preferred_contact: string;
-  preferred_date: string | null;
   topic: string;
   message: string;
   enrolment_number: string;
+  enrolment_verified: boolean;
   court: string;
   case_number: string;
-  needed_by: string | null;
-  history: { old_status: string | null; new_status: string; label: string; note: string; at: string; by: string | null }[];
-  notes: { id: number; body: string; internal: boolean; author: string | null; from_staff: boolean; at: string }[];
-  documents: { id: string; filename: string; size: number; kind: string; version: number; at: string }[];
-  assignees: { id: string; name: string; roles: string[] }[];
+  opposite_party: string;
+  requires_advocate: boolean;
+  status_explain: string;
+  history: History[];
+  notes: { id: number; body: string; internal: boolean; kind: string; author: string | null; from_staff: boolean; at: string }[];
+  documents: Doc[];
+  assignees: { id: string; name: string; roles: string[]; conflict_checked: boolean }[];
   allowed_next: string[];
   can_manage: boolean;
+  can_allocate: boolean;
   is_requester: boolean;
 }
 
@@ -106,6 +138,9 @@ export interface Branch {
   phone: string;
   email: string;
   hours: string;
+  description: string;
+  office_status: "operational" | "service_area" | "planned";
+  manager_name: string;
 }
 
 export interface Service {
@@ -114,13 +149,70 @@ export interface Service {
   name: string;
   category: string;
   audience: string;
-  fee_text: string;
+  requires_advocate: boolean;
+  fee_text?: string;
+  is_active?: boolean;
 }
 
-export const isStaff = (u: User | null) => !!u && u.roles.some((r) => ["drafting_staff", "advocate_reviewer", "branch_manager", "admin", "super_admin"].includes(r));
+export interface PublicConfig {
+  demo_mode: boolean;
+  today_india: string;
+  earliest_needed_by: string;
+  max_upload_mb: number;
+  max_files_per_request: number;
+}
+
+export const STAFF_ROLES = ["drafting_staff", "support_staff", "advocate_reviewer", "branch_manager", "admin", "super_admin"];
+export const isStaff = (u: User | null) => !!u && u.roles.some((r) => STAFF_ROLES.includes(r));
 export const isAdmin = (u: User | null) => !!u && u.roles.some((r) => ["admin", "super_admin"].includes(r));
 export const isManager = (u: User | null) => !!u && (isAdmin(u) || u.roles.includes("branch_manager"));
 export const isLawyer = (u: User | null) => !!u && u.roles.includes("lawyer");
+export const isBusiness = (u: User | null) => !!u && u.roles.includes("business_client");
+export const isReviewer = (u: User | null) => !!u && u.roles.includes("advocate_reviewer");
+
+// India has one time zone and no daylight saving, so a fixed +05:30 offset gives the India-local date.
+export function indiaToday(): string {
+  const now = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  return now.toISOString().slice(0, 10);
+}
+
+export function addDays(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+export const MIN_NEEDED_BY_DAYS = 2;
+export const earliestNeededBy = () => addDays(indiaToday(), MIN_NEEDED_BY_DAYS);
+
+export function fmtDay(iso: string | null | undefined) {
+  if (!iso) return "";
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
+/** Multipart POST with upload progress (fetch cannot report upload progress). */
+export function upload<T>(path: string, form: FormData, onProgress?: (pct: number) => void, headers: Record<string, string> = {}): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `/api/v1${path}`);
+    xhr.withCredentials = true;
+    xhr.setRequestHeader("X-Requested-With", "legalcore");
+    for (const [k, v] of Object.entries(headers)) xhr.setRequestHeader(k, v);
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress?.(Math.round((e.loaded / e.total) * 100));
+    xhr.onload = () => {
+      let data: unknown = null;
+      try {
+        data = xhr.responseText ? JSON.parse(xhr.responseText) : null;
+      } catch {
+        data = null;
+      }
+      if (xhr.status >= 200 && xhr.status < 300) resolve(data as T);
+      else reject(new ApiError(xhr.status, messageFrom(data, xhr.status)));
+    };
+    xhr.onerror = () => reject(new ApiError(0, "Could not reach Legal Core. Check your internet connection and try again."));
+    xhr.send(form);
+  });
+}
 
 export function fmtDate(s: string | null | undefined, withTime = false) {
   if (!s) return "";

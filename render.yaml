@@ -1,7 +1,9 @@
 # One-click free preview on Render: https://render.com/deploy?repo=https://github.com/vaishnavi33/Legalcore
 # Creates a PostgreSQL database, the API and the website. Free services sleep after 15 minutes without
 # visitors and take about a minute to wake up. Free databases expire after 30 days.
-# The preview loads demo accounts and sample requests. Do not use it for real client data.
+# The preview loads fictional demo users and sample requests. Do not use it for real client data.
+# Set DEMO_PASSWORD (and ADMIN_EMAIL / ADMIN_PASSWORD for your own admin) privately in the Render dashboard.
+# Never commit passwords to this file.
 databases:
   - name: legalcore-db
     plan: free
@@ -32,6 +34,14 @@ services:
         value: "true"
       - key: UPLOAD_DIR
         value: /tmp/legalcore-uploads
+      - key: DEMO_MODE
+        value: "true"
+      - key: DEMO_PASSWORD
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
 
   - type: web
     name: legalcore-web-vaishnavi33

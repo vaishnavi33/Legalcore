@@ -117,6 +117,9 @@ def seed_demo(db) -> None:
     if generated:
         password = secrets.token_urlsafe(12)
     pw = hash_password(password)
+    # The demo administrator stays switched off unless DEMO_ADMIN_ENABLED=true (never on a public site).
+    # Use ADMIN_EMAIL and ADMIN_PASSWORD, kept private, for a real super admin instead.
+    demo_admin = os.environ.get("DEMO_ADMIN_ENABLED", "").lower() == "true"
     existing = db.scalars(select(User).where(User.mobile.like("90000000%"))).all()
     if existing:
         # Replace any earlier, published demo password with the current private one.
@@ -129,9 +132,13 @@ def seed_demo(db) -> None:
                 enrolment_number="DEMO/0000/2010", state_bar_council="Bar Council of Telangana (demo)", verification_status="verified",
                 verified_at=datetime.now(UTC), verification_note="Demo record. Not a real advocate.",
             )
+        for u in existing:
+            if u.mobile == "9000000001":
+                u.is_active = demo_admin
         print("Demo users already exist; their password was reset." + (f" New random password: {password}" if generated else ""))
         return
     admin = _user(db, pw, "Demo Admin", "9000000001", "admin@demo.legalcore.example", [Role.ADMIN])
+    admin.is_active = demo_admin
     mgr = _user(db, pw, "Kavitha Rao (demo)", "9000000002", "manager.hyd@demo.legalcore.example", [Role.BRANCH_MANAGER], ["hyderabad"])
     _user(db, pw, "Suresh Naidu (demo)", "9000000003", "manager.knl@demo.legalcore.example", [Role.BRANCH_MANAGER], ["kurnool"])
     drafter = _user(db, pw, "Praveen Kumar (demo)", "9000000004", "drafting@demo.legalcore.example", [Role.DRAFTING_STAFF], ["hyderabad"])

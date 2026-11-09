@@ -1,53 +1,108 @@
-import { Band, BranchTiles, Fork, ServiceCards, Steps } from "@/components/Blocks";
+import Link from "next/link";
+import { ArticleCards, Band, BranchTiles, Fork, Steps } from "@/components/Blocks";
 import Builder from "@/components/Builder";
+import { ClockIcon, FileIcon, ShieldIcon } from "@/components/Icons";
 import SiteSearch from "@/components/SiteSearch";
-import { SERVICES } from "@/lib/content";
+import { ARTICLES } from "@/lib/articles";
 
 export default function Home() {
   return (
     <>
-      <div className="wrap hero">
-        <span className="label">Andhra Pradesh &amp; Telangana · 6 branches</span>
-        <h1>Your legal work. Simplified.</h1>
-        <p className="lead">
-          Professional legal documentation and support. We help lawyers prepare strong drafts and research, and we help people understand their legal problem and get advice
-          from a qualified advocate.
-        </p>
-        <Builder />
-        <div style={{ display: "grid", gap: 8, maxWidth: 640 }}>
-          <span className="flabel">Or search for what you need</span>
-          <SiteSearch big placeholder="Try: bail, land problem, rent agreement, cheque bounce, Kurnool" />
+      <section className="masthead">
+        <div className="wrap masthead-in">
+          <div className="mh-copy">
+            <span className="label">Legal support &amp; coordination · Andhra Pradesh and Telangana</span>
+            <h1>
+              Your legal work.
+              <br />
+              <em>Simplified.</em>
+            </h1>
+            <p className="lead">Professional legal support, documentation and coordination for lawyers, individuals and businesses.</p>
+            <div className="btns">
+              <Link className="btn" href="/request">
+                Submit a request
+              </Link>
+              <Link className="btn ghost" href="/how-it-works">
+                How it works
+              </Link>
+            </div>
+            <p className="note">No account needed. Track your request with your reference number and a one-time code.</p>
+          </div>
+          <div className="mh-side">
+            <Builder />
+            <div style={{ display: "grid", gap: 8 }}>
+              <span className="flabel">Or search</span>
+              <SiteSearch big placeholder="Try: legal opinion, rent agreement, cheque bounce" />
+            </div>
+          </div>
         </div>
-      </div>
-      <section className="blk" style={{ paddingTop: 8 }}>
+      </section>
+
+      <section className="blk">
         <div className="wrap">
+          <div className="sec-head">
+            <span className="label">Who we serve</span>
+            <h2>One platform for three kinds of legal work</h2>
+          </div>
           <Fork />
         </div>
       </section>
+
       <section className="blk">
         <div className="wrap">
           <div className="sec-head">
-            <span className="label">Our services</span>
-            <h2>One platform. Many legal services.</h2>
+            <span className="label">How Legal Core works</span>
+            <h2>A managed service, not a marketplace</h2>
+            <p className="muted">
+              You do not browse or hire lawyers here. You tell us what you need; we understand the requirement, coordinate the right drafting professional or qualified
+              advocate, manage the documents, and keep you informed until the work is complete.
+            </p>
           </div>
-          <ServiceCards list={SERVICES} />
+          <div className="pillars">
+            <div>
+              <FileIcon />
+              <h3>One request, one record</h3>
+              <p>Every message, document and status change is kept against your request reference.</p>
+            </div>
+            <div>
+              <ShieldIcon />
+              <h3>Qualified advocates for advice</h3>
+              <p>Legal opinions, advice and representation are provided only by appropriately qualified advocates.</p>
+            </div>
+            <div>
+              <ClockIcon />
+              <h3>Clear progress</h3>
+              <p>See where your request stands at each step, from screening to delivery.</p>
+            </div>
+          </div>
+          <div style={{ marginTop: 36 }}>
+            <Steps short />
+          </div>
+          <p style={{ marginTop: 20 }}>
+            <Link href="/how-it-works">See all nine steps →</Link>
+          </p>
         </div>
       </section>
+
       <section className="blk">
         <div className="wrap">
           <div className="sec-head">
-            <span className="label">How it works</span>
-            <h2>Four steps, no legal jargon</h2>
+            <span className="label">Knowledge Centre</span>
+            <h2>Understand the basics</h2>
           </div>
-          <Steps />
+          <ArticleCards list={ARTICLES.slice(0, 3)} />
+          <p style={{ marginTop: 18 }}>
+            <Link href="/knowledge">All articles →</Link>
+          </p>
         </div>
       </section>
+
       <section className="blk">
         <div className="wrap">
           <div className="sec-head">
-            <span className="label">Our branch network</span>
-            <h2>Six offices, one team</h2>
-            <p className="muted">Every branch works on the same system, so your request is handled the same way wherever you start.</p>
+            <span className="label">Our locations</span>
+            <h2>Serving six cities from one platform</h2>
+            <p className="muted">You never need to choose a branch. Our team allocates each request internally.</p>
           </div>
           <BranchTiles />
         </div>
