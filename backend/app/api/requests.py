@@ -175,11 +175,11 @@ async def create_request(
 
     added = await store_files(db, req, files or [], user, DocKind.ORIGINAL)
     db.flush()
-    subject = f"Legal Core: request {req.request_number} received"
+    subject = f"Legal Core Solutions: request {req.request_number} received"
     text = (
         f"Dear {req.contact_name},\n\nWe have received your request for {service.name}. Your reference number is {req.request_number}.\n"
         "Our team will review it and contact you. A requested date is noted but is not a promise of completion.\n\n"
-        "You can track this request on our website with your reference number and a one-time code sent to you.\n\nLegal Core"
+        "You can track this request on our website with your reference number and a one-time code sent to you.\n\nLegal Core Solutions"
     )
     acks = notify.notify_requester(db, req, subject, text, sms=True)
     audit(db, user, "request.create", "request", req.request_number, client_ip(request), service=service.slug, files=len(added))
@@ -209,7 +209,7 @@ def list_requests(
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
 ):
     if scope == "work" and not user.is_staff:
-        raise HTTPException(403, "This list is for Legal Core staff.")
+        raise HTTPException(403, "This list is for Legal Core Solutions staff.")
     stmt = perm.visible_requests_query(user, scope)
     if status:
         stmt = stmt.where(LegalRequest.status == status)
@@ -265,8 +265,8 @@ def set_status(number: str, body: StatusChangeIn, user: CurrentUser, db: DB, req
     if not perm.is_requester(user, r):
         msg = f"Your request {r.request_number} is now: {LABELS[r.status]}. {EXPLAIN[r.status]}"
         if body.note:
-            msg += f"\n\nMessage from Legal Core: {body.note}"
-        notify.notify_requester(db, r, f"Legal Core: update on {r.request_number}", msg)
+            msg += f"\n\nMessage from Legal Core Solutions: {body.note}"
+        notify.notify_requester(db, r, f"Legal Core Solutions: update on {r.request_number}", msg)
     db.commit()
     db.refresh(r)
     return detail(r, user)
@@ -276,7 +276,7 @@ def set_status(number: str, body: StatusChangeIn, user: CurrentUser, db: DB, req
 def set_priority(number: str, body: PriorityIn, user: CurrentUser, db: DB, request: Request):
     r = _load(db, number, user)
     if not perm.staff_can_access(user, r):
-        raise HTTPException(403, "Only Legal Core staff can set priority.")
+        raise HTTPException(403, "Only Legal Core Solutions staff can set priority.")
     if body.priority == r.priority:
         return detail(r, user)
     old = r.priority
@@ -431,7 +431,7 @@ async def add_note(
             msg = f"There is a new update on your request {r.request_number}."
             if visible_docs:
                 msg += f" {len(visible_docs)} document(s) shared with you."
-            notify.notify_requester(db, r, f"Legal Core: new message on {r.request_number}", msg)
+            notify.notify_requester(db, r, f"Legal Core Solutions: new message on {r.request_number}", msg)
     db.commit()
     db.refresh(r)
     return detail(r, user)

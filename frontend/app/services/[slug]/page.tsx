@@ -29,7 +29,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <p className="lead">{s.short}</p>
         {s.advocate && (
           <p className="callout">
-            This service is handled by an appropriately qualified advocate. Legal Core coordinates the request and does not itself give legal advice.
+            This service is handled by an appropriately qualified advocate. Legal Core Solutions coordinates the request and does not itself give legal advice.
           </p>
         )}
       </div>

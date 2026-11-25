@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Crumbs, PROCESS } from "@/components/Blocks";
 
-export const metadata = { title: "How It Works", description: "The Legal Core process from request to delivery." };
+export const metadata = { title: "How It Works", description: "The Legal Core Solutions process from request to delivery." };
 
 export default function HowItWorks() {
   return (
@@ -11,7 +11,7 @@ export default function HowItWorks() {
         <span className="label">How it works</span>
         <h1>From your request to completed work</h1>
         <p className="lead">
-          Legal Core coordinates the service from start to finish. Professional legal advice and representation are provided by qualified advocates where
+          Legal Core Solutions coordinates the service from start to finish. Professional legal advice and representation are provided by qualified advocates where
           applicable.
         </p>
       </div>

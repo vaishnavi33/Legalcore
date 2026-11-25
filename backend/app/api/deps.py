@@ -43,7 +43,7 @@ def current_user(user: Annotated[User | None, Depends(optional_user)]) -> User:
 
 def staff_user(user: Annotated[User, Depends(current_user)]) -> User:
     if not user.is_staff:
-        raise HTTPException(status_code=403, detail="This page is for Legal Core staff.")
+        raise HTTPException(status_code=403, detail="This page is for Legal Core Solutions staff.")
     return user
 
 

@@ -368,7 +368,7 @@ export const ARTICLES: Article[] = [
       },
     ],
     faq: [
-      ["Can Legal Core do the title check?", "Legal Core can coordinate a title verification by a qualified advocate. Choose Legal Opinion when you submit your request."],
+      ["Can Legal Core Solutions do the title check?", "Legal Core Solutions can coordinate a title verification by a qualified advocate. Choose Legal Opinion when you submit your request."],
       ["Is a bank-approved property safe?", "A bank's approval helps, but it is not a guarantee. Get your own advocate's opinion."],
     ],
     references: [

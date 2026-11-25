@@ -10,7 +10,7 @@ export default function Locations() {
         <span className="label">Our locations</span>
         <h1>Six locations. One platform.</h1>
         <p className="lead">
-          Legal Core serves Anantapur, Puttaparthi, Vijayawada, Visakhapatnam and Kurnool in Andhra Pradesh, and Hyderabad in Telangana. Each location page
+          Legal Core Solutions serves Anantapur, Puttaparthi, Vijayawada, Visakhapatnam and Kurnool in Andhra Pradesh, and Hyderabad in Telangana. Each location page
           shows whether it is an operational office, a service area or a planned location.
         </p>
         <p className="muted">You never need to pick a branch. Requests are allocated internally based on workload, location and the expertise required.</p>

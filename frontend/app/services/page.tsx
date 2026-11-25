@@ -10,7 +10,7 @@ export default function Services() {
       <div className="wrap hero page-head">
         <span className="label">Legal services</span>
         <h1>What we can help with</h1>
-        <p className="lead">Choose a service to see what is included, who it is for, what to keep ready and common questions. Legal Core coordinates each request; legal advice and opinions come only from qualified advocates.</p>
+        <p className="lead">Choose a service to see what is included, who it is for, what to keep ready and common questions. Legal Core Solutions coordinates each request; legal advice and opinions come only from qualified advocates.</p>
       </div>
       <section className="blk" style={{ paddingTop: 0 }}>
         <div className="wrap">

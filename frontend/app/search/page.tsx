@@ -12,7 +12,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     <>
       <Crumbs items={[["Search"]]} />
       <div className="wrap hero" style={{ paddingBottom: 16 }}>
-        <h1>{q ? <>Results for “{q}”</> : "Search Legal Core"}</h1>
+        <h1>{q ? <>Results for “{q}”</> : "Search Legal Core Solutions"}</h1>
         <div style={{ maxWidth: 640 }}>
           <SiteSearch big />
         </div>

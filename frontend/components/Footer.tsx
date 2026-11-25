@@ -7,10 +7,10 @@ export default function Footer() {
     <footer className="site">
       <div className="wrap">
         <div className="foot-brand">
-          <Link className="brand" href="/" aria-label="Legal Core home">
+          <Link className="brand" href="/" aria-label="Legal Core Solutions home">
             <Logo size={36} />
             <span>
-              <b>Legal Core</b>
+              <b>Legal Core Solutions</b>
             </span>
           </Link>
           <p>Professional legal support, documentation and coordination for lawyers, individuals and businesses.</p>
@@ -30,7 +30,7 @@ export default function Footer() {
             </div>
           ))}
           <div>
-            <h4>Legal Core</h4>
+            <h4>Legal Core Solutions</h4>
             <Link href="/about">About Us</Link>
             <Link href="/how-it-works">How It Works</Link>
             <Link href="/locations">Our Locations</Link>
@@ -47,9 +47,9 @@ export default function Footer() {
           </div>
         </div>
         <div className="disclaimer">
-          <span>© {new Date().getFullYear()} Legal Core. Serving Anantapur, Puttaparthi, Vijayawada, Visakhapatnam, Kurnool and Hyderabad.</span>
+          <span>© {new Date().getFullYear()} Legal Core Solutions. Serving Anantapur, Puttaparthi, Vijayawada, Visakhapatnam, Kurnool and Hyderabad.</span>
           <span>
-            Legal Core is a legal support and coordination agency. It is not a law firm and does not advertise or solicit work for advocates. Legal
+            Legal Core Solutions is a legal support and coordination agency. It is not a law firm and does not advertise or solicit work for advocates. Legal
             opinions, legal advice and representation are provided only by appropriately qualified advocates, subject to applicable Indian law and
             professional rules. Information on this website is general and is not legal advice. No outcome is guaranteed.
           </span>

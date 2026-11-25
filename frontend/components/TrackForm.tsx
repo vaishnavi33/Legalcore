@@ -136,7 +136,7 @@ export default function TrackForm() {
           <Timeline steps={res.steps} />
           {res.updates.some((u) => u.note) && (
             <div>
-              <h3 style={{ marginBottom: 10 }}>Updates from Legal Core</h3>
+              <h3 style={{ marginBottom: 10 }}>Updates from Legal Core Solutions</h3>
               <div className="thread">
                 {res.updates
                   .filter((u) => u.note)

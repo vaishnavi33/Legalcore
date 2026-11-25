@@ -1,6 +1,6 @@
 """Request status rules. Every change goes through `change_status`, which checks the transition and records history.
 
-The workflow has no quotation or payment stages. Legal Core coordinates the work; opinions and other legal
+The workflow has no quotation or payment stages. Legal Core Solutions coordinates the work; opinions and other legal
 content pass through a verified advocate reviewer before they reach the client."""
 
 from fastapi import HTTPException

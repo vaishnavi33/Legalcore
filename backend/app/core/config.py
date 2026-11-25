@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     # First super admin, created by `python -m app.seed` if no admin exists yet.
     admin_email: str = "admin@legalcore.in"
     admin_password: str = ""
-    admin_name: str = "Legal Core Admin"
+    admin_name: str = "Legal Core Solutions Admin"
 
     # Simple in-process rate limits (per client IP). Use a shared store such as Redis when running several API instances.
     rate_limit_login_per_min: int = 10

@@ -8,10 +8,10 @@ export default function About() {
     <>
       <Crumbs items={[["About Us"]]} />
       <div className="wrap hero page-head">
-        <span className="label">About Legal Core</span>
+        <span className="label">About Legal Core Solutions</span>
         <h1>A legal support and coordination agency.</h1>
         <p className="lead">
-          Legal Core solutions is a legal support and coordination agency operating in India. We serve lawyers and advocates, individuals and members of the public,
+          Legal Core Solutions is a legal support and coordination agency operating in India. We serve lawyers and advocates, individuals and members of the public,
           and businesses and organisations.
         </p>
       </div>
@@ -20,12 +20,12 @@ export default function About() {
           <div className="prose" style={{ maxWidth: "68ch" }}>
             <h2>What we do</h2>
             <p>
-              Legal Core receives requests for legal assistance, understands the requirement, coordinates the appropriate drafting professionals or qualified
+              Legal Core Solutions receives requests for legal assistance, understands the requirement, coordinates the appropriate drafting professionals or qualified
               advocates, manages the documents, monitors progress and communicates with the customer until the requested work is completed.
             </p>
             <h2>What we are not</h2>
             <p>
-              Legal Core is not a law firm, and it is not a marketplace where customers browse and hire lawyers. Not everyone who works at Legal Core is an advocate.
+              Legal Core Solutions is not a law firm, and it is not a marketplace where customers browse and hire lawyers. Not everyone who works at Legal Core Solutions is an advocate.
               Professional legal opinions, legal advice and representation are provided only by appropriately qualified advocates, subject to applicable Indian law
               and professional rules. We do not promise or guarantee outcomes.
             </p>
@@ -37,14 +37,24 @@ export default function About() {
               <li>Internal notes are never shown to customers.</li>
             </ul>
           </div>
-          <div className="card">
-            <span className="label">Start here</span>
-            <h3>Have a legal requirement?</h3>
-            <p className="muted">Submit a request online. You do not need an account.</p>
-            <Link className="btn" href="/request">
-              Submit a request
-            </Link>
-            <Link href="/how-it-works">How it works →</Link>
+          <div style={{ display: "grid", gap: 20, alignContent: "start" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="about-badge"
+              src="/brand/logo-full.jpg"
+              width={1536}
+              height={1024}
+              alt="Legal Core Solutions logo: Advocate Service to the Public. Expert legal support, professional guidance, effective representation, timely service, reliable and transparent. Trust, integrity, justice."
+            />
+            <div className="card">
+              <span className="label">Start here</span>
+              <h3>Have a legal requirement?</h3>
+              <p className="muted">Submit a request online. You do not need an account.</p>
+              <Link className="btn" href="/request">
+                Submit a request
+              </Link>
+              <Link href="/how-it-works">How it works →</Link>
+            </div>
           </div>
         </div>
       </section>

@@ -35,7 +35,7 @@ export async function api<T = unknown>(path: string, init: RequestInit & { json?
   try {
     res = await fetch(`/api/v1${path}`, { ...init, headers, body, credentials: "same-origin", cache: "no-store" });
   } catch {
-    throw new ApiError(0, "Could not reach Legal Core. Check your internet connection and try again.");
+    throw new ApiError(0, "Could not reach Legal Core Solutions. Check your internet connection and try again.");
   }
   if (res.status === 204) return undefined as T;
   const text = await res.text();
@@ -209,7 +209,7 @@ export function upload<T>(path: string, form: FormData, onProgress?: (pct: numbe
       if (xhr.status >= 200 && xhr.status < 300) resolve(data as T);
       else reject(new ApiError(xhr.status, messageFrom(data, xhr.status)));
     };
-    xhr.onerror = () => reject(new ApiError(0, "Could not reach Legal Core. Check your internet connection and try again."));
+    xhr.onerror = () => reject(new ApiError(0, "Could not reach Legal Core Solutions. Check your internet connection and try again."));
     xhr.send(form);
   });
 }

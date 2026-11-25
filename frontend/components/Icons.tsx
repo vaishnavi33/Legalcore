@@ -6,20 +6,11 @@ export const Chevron = () => (
   </svg>
 );
 
-/** The Legal Core seal: the original balance motif, refined and set in a navy roundel with a gold ring. */
+/** The Legal Core Solutions mark (LC monogram with gold scales), cropped from the full logo in public/brand/logo-full.jpg.
+    It sits on an ivory tile wherever the background is dark, so the navy letters stay visible. */
 export const Logo = ({ size = 40 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" className="logo">
-    <circle cx="24" cy="24" r="23" fill="#13294b" />
-    <circle cx="24" cy="24" r="19.5" fill="none" stroke="#c9a861" strokeWidth="0.9" />
-    <g fill="none" stroke="#e6cd92" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M24 12.5v21" />
-      <path d="M15.5 16.5h17" />
-      <circle cx="24" cy="12" r="1.1" fill="#e6cd92" stroke="none" />
-      <path d="M15.5 16.5l-3.6 8h7.2zM32.5 16.5l-3.6 8h7.2z" />
-      <path d="M11.9 24.5a3.6 2 0 0 0 7.2 0M28.9 24.5a3.6 2 0 0 0 7.2 0" />
-      <path d="M19 34.5h10" />
-    </g>
-  </svg>
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src="/brand/logo-mark.png" alt="" aria-hidden="true" width={Math.round((size * 346) / 144)} height={size} className="logo" />
 );
 
 const I = ({ children, size = 26 }: { children: React.ReactNode; size?: number }) => (

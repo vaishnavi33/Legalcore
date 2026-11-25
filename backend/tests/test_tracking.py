@@ -66,5 +66,5 @@ def test_no_code_without_provider_outside_demo(api, monkeypatch):
     r = _start(api, num)
     assert r.status_code == 503 and "could not send" in r.text
     logs = admin().get("/api/v1/admin/notifications").json()
-    sms = [n for n in logs if n["channel"] == "sms" and n["subject"] == "Legal Core verification code"]
+    sms = [n for n in logs if n["channel"] == "sms" and n["subject"] == "Legal Core Solutions verification code"]
     assert sms and all(n["status"] == "not_configured" for n in sms)

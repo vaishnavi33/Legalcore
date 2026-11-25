@@ -649,7 +649,7 @@ function Conversation({ r, user, onSend, setErr }: { r: RequestDetail; user: Use
           <div key={n.id} className={`msg${n.internal ? " internal" : n.from_staff ? " staff" : ""}${n.kind === "review" ? " review" : ""}`}>
             <header>
               <b>
-                {n.from_staff ? (s ? n.author : "Legal Core team") : n.author || "Requester"}
+                {n.from_staff ? (s ? n.author : "Legal Core Solutions team") : n.author || "Requester"}
                 {n.internal && " · internal note"}
                 {NOTE_KIND[n.kind] && ` · ${NOTE_KIND[n.kind]}`}
               </b>

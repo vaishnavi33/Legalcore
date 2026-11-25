@@ -95,10 +95,10 @@ export default function Header() {
         </div>
       </div>
       <div className="wrap bar">
-        <Link className="brand" href="/" aria-label="Legal Core home">
+        <Link className="brand" href="/" aria-label="Legal Core Solutions home">
           <Logo />
           <span>
-            <b>Legal Core</b>
+            <b>Legal Core Solutions</b>
             <small>Legal support &amp; coordination</small>
           </span>
         </Link>
