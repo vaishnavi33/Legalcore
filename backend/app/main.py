@@ -10,7 +10,7 @@ from app.core.db import engine
 settings = get_settings()
 
 app = FastAPI(
-    title="Legal Core API",
+    title="Legal Core Solutions API",
     version="2.0.0",
     docs_url=None if settings.is_production else "/api/docs",
     openapi_url=None if settings.is_production else "/api/openapi.json",

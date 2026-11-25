@@ -63,7 +63,7 @@ def test_advocate_verification(make_api):
     assert a.patch(url, json={"verification_status": "verified"}).status_code == 422  # needs State Bar Council and a note
     assert a.patch(url, json={"state_bar_council": "Bar Council of Telangana", "verification_status": "verified"}).status_code == 422
     r = a.patch(url, json={"state_bar_council": "Bar Council of Telangana", "verification_status": "verified", "verification_note": "Checked roll on 9 Nov 2026"})
-    assert r.status_code == 200 and r.json()["verified_by"] == "Legal Core Admin" and r.json()["verified_at"]
+    assert r.status_code == 200 and r.json()["verified_by"] == "Legal Core Solutions Admin" and r.json()["verified_at"]
     assert a.patch(url, json={"verification_status": "suspended"}).status_code == 422  # reason
     assert a.patch(url, json={"verification_status": "suspended", "verification_note": "Under inquiry"}).json()["verification_status"] == "suspended"
     network = a.get("/api/v1/admin/advocates?kind=network").json()

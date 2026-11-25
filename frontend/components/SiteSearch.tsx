@@ -53,7 +53,7 @@ export default function SiteSearch({ big = false, placeholder = "Search: bail, r
       <SearchIcon />
       <input
         type="search"
-        aria-label="Search Legal Core"
+        aria-label="Search Legal Core Solutions"
         role="combobox"
         aria-expanded={open && q.length > 0}
         aria-controls={id}

@@ -25,12 +25,12 @@ export default async function BranchPage({ params }: { params: Promise<{ slug: s
       <Crumbs items={[["Our Locations", "/locations"], [b.name]]} />
       <div className="wrap hero page-head">
         <span className="label">{b.state}</span>
-        <h1>Legal Core, {b.name}</h1>
+        <h1>Legal Core Solutions, {b.name}</h1>
         <p className="te" style={{ fontSize: "1.15rem" }}>
           {b.te}
         </p>
         <p className="lead">
-          All Legal Core locations use the same central platform and one common sign-in. You do not need to choose a branch: send your request online and our
+          All Legal Core Solutions locations use the same central platform and one common sign-in. You do not need to choose a branch: send your request online and our
           team allocates it internally.
         </p>
       </div>
@@ -39,7 +39,7 @@ export default async function BranchPage({ params }: { params: Promise<{ slug: s
           <BranchContact slug={b.slug} name={b.name} state={b.state} />
           <div className="card">
             <h3>Services</h3>
-            <p className="muted">Every Legal Core service is available to people in {b.name}.</p>
+            <p className="muted">Every Legal Core Solutions service is available to people in {b.name}.</p>
             <ul>
               {services.map(([t, h]) => (
                 <li key={h}>

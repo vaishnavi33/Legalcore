@@ -169,7 +169,7 @@ function Advocates({ user }: { user: User }) {
         <select aria-label="Who" value={kind} onChange={(e) => setKind(e.target.value)}>
           <option value="">Everyone with an enrolment record</option>
           <option value="network">Advocate network (reviewers)</option>
-          <option value="lawyers">Lawyers using Legal Core</option>
+          <option value="lawyers">Lawyers using Legal Core Solutions</option>
         </select>
         <select aria-label="Verification status" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">Any status</option>

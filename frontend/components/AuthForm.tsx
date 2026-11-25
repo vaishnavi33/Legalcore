@@ -57,7 +57,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
         <div className="desk">
           <div className="sec-head" style={{ margin: 0 }}>
             <span className="label">One account for everyone</span>
-            <h1 style={{ fontSize: "clamp(1.8rem,4vw,2.4rem)" }}>{reg ? "Create your account" : "Sign in to Legal Core"}</h1>
+            <h1 style={{ fontSize: "clamp(1.8rem,4vw,2.4rem)" }}>{reg ? "Create your account" : "Sign in to Legal Core Solutions"}</h1>
             <p className="muted">
               Lawyers, clients and our staff all use the same sign in. After you sign in, you see the pages and requests that belong to you.
             </p>

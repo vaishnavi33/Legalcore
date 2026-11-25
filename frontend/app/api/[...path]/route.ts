@@ -24,7 +24,7 @@ async function proxy(req: NextRequest, ctx: { params: Promise<{ path: string[] }
   try {
     res = await fetch(target, init);
   } catch {
-    return Response.json({ detail: "Legal Core is starting up. Please try again in a few seconds." }, { status: 503 });
+    return Response.json({ detail: "Legal Core Solutions is starting up. Please try again in a few seconds." }, { status: 503 });
   }
   const out = new Headers();
   res.headers.forEach((v, k) => {

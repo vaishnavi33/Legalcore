@@ -229,7 +229,7 @@ def advocates(
     status: VerificationStatus | None = None,
     kind: Annotated[str | None, Query(pattern="^(network|lawyers)$")] = None,
 ):
-    """Internal advocate network (advocate reviewers) and lawyers who use Legal Core. Never shown publicly."""
+    """Internal advocate network (advocate reviewers) and lawyers who use Legal Core Solutions. Never shown publicly."""
     stmt = select(User).join(LawyerProfile, LawyerProfile.user_id == User.id)
     if status:
         stmt = stmt.where(LawyerProfile.verification_status == status.value)

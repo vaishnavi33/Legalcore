@@ -354,7 +354,7 @@ export default function RequestForm({
           <label className="check" htmlFor="f-ok">
             <input type="checkbox" id="f-ok" data-f="consent" checked={consent} onChange={(e) => (setConsent(e.target.checked), setErrs({ ...errs, consent: undefined }))} />
             <span>
-              I have read the <Link href="/privacy">Privacy Notice</Link>. I agree that Legal Core may use the details and documents I provide to handle
+              I have read the <Link href="/privacy">Privacy Notice</Link>. I agree that Legal Core Solutions may use the details and documents I provide to handle
               this request and contact me about it. *
             </span>
           </label>

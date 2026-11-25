@@ -11,7 +11,7 @@ const COPY: Record<Aud, { label: string; h1: string; lead: string; points: strin
   lawyer: {
     label: "For lawyers and advocates",
     h1: "Dependable support for your practice.",
-    lead: "Send your instructions and papers. Legal Core coordinates drafting, research and preparation, and returns the work for you to review, settle and file. You remain counsel on record.",
+    lead: "Send your instructions and papers. Legal Core Solutions coordinates drafting, research and preparation, and returns the work for you to review, settle and file. You remain counsel on record.",
     points: ["Your instructions drive the work", "Papers seen only by the assigned team", "Draft versions and comments in one place", "Track every request and deadline"],
   },
   individual: {

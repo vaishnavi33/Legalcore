@@ -12,7 +12,7 @@ export default function Privacy() {
         <header className="page-head">
           <span className="label">Your data</span>
           <h1>Privacy Notice</h1>
-          <p className="lead">How Legal Core collects, uses, stores and protects your personal data, and how you can exercise your rights.</p>
+          <p className="lead">How Legal Core Solutions collects, uses, stores and protects your personal data, and how you can exercise your rights.</p>
           <p className="meta">
             Last updated 9 November 2026 · <span className="pending">Draft: to be reviewed by a qualified advocate before launch</span>
           </p>
@@ -20,7 +20,7 @@ export default function Privacy() {
         <div className="prose" style={{ maxWidth: "72ch" }}>
           <h2>Who we are</h2>
           <p>
-            Legal Core is a legal support and coordination agency. For the personal data you give us to handle your request, Legal Core decides why and how it is
+            Legal Core Solutions is a legal support and coordination agency. For the personal data you give us to handle your request, Legal Core Solutions decides why and how it is
             processed, which makes it the data fiduciary under the Digital Personal Data Protection Act, 2023 (DPDP Act).
           </p>
 
@@ -50,7 +50,7 @@ export default function Privacy() {
 
           <h2>Who can see it</h2>
           <p>
-            Only Legal Core staff and professionals assigned to your request can see its details and documents. Access is controlled on our servers, by role and
+            Only Legal Core Solutions staff and professionals assigned to your request can see its details and documents. Access is controlled on our servers, by role and
             by request, and access is recorded. Internal staff notes are never shown to customers. We share data with advocates or professionals engaged on your
             matter, and with service providers who host or deliver our systems under confidentiality obligations.
           </p>

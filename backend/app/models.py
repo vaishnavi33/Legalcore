@@ -143,7 +143,7 @@ class UserRole(Base):
 
 
 class LawyerProfile(Base):
-    """Professional details for lawyers who use Legal Core and for advocates in the internal network.
+    """Professional details for lawyers who use Legal Core Solutions and for advocates in the internal network.
     A submitted enrolment number is only a claim until staff verify it."""
 
     __tablename__ = "lawyer_profiles"

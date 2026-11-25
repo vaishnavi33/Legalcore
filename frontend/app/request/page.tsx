@@ -1,7 +1,7 @@
 import { Crumbs } from "@/components/Blocks";
 import RequestForm from "@/components/RequestForm";
 
-export const metadata = { title: "Submit a Legal Request", description: "Send a request to Legal Core without creating an account." };
+export const metadata = { title: "Submit a Legal Request", description: "Send a request to Legal Core Solutions without creating an account." };
 
 export default function Page() {
   return (

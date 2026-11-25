@@ -18,7 +18,7 @@ export default function Terms() {
         <div className="prose" style={{ maxWidth: "72ch" }}>
           <h2>Our role</h2>
           <p>
-            Legal Core is a legal support and coordination agency. It is not a law firm. It coordinates drafting professionals and qualified advocates for the work
+            Legal Core Solutions is a legal support and coordination agency. It is not a law firm. It coordinates drafting professionals and qualified advocates for the work
             you request. Professional legal opinions, legal advice and representation are provided only by appropriately qualified advocates, subject to
             applicable Indian law and the rules of the Bar Council of India and the State Bar Councils.
           </p>
@@ -30,11 +30,11 @@ export default function Terms() {
             <li>Please give accurate information and only upload documents you are entitled to share.</li>
           </ul>
           <h2>No guaranteed outcomes</h2>
-          <p>Legal Core does not guarantee the outcome of any matter, case or negotiation.</p>
+          <p>Legal Core Solutions does not guarantee the outcome of any matter, case or negotiation.</p>
           <h2>Lawyer users</h2>
           <p>
-            When Legal Core supports a lawyer, the lawyer remains responsible for the matter, for reviewing all work and for anything filed or sent. A Bar Council
-            enrolment number given in a request is not treated as verified until Legal Core completes a separate verification.
+            When Legal Core Solutions supports a lawyer, the lawyer remains responsible for the matter, for reviewing all work and for anything filed or sent. A Bar Council
+            enrolment number given in a request is not treated as verified until Legal Core Solutions completes a separate verification.
           </p>
           <h2>Accounts and security</h2>
           <p>Keep your password private. Tell us immediately if you think someone else has used your account.</p>

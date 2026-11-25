@@ -73,10 +73,10 @@ def start(body: TrackStart, request: Request, db: DB):
     db.add(ch)
     db.flush()
     ch.code_hash = hash_otp(code, str(ch.id))
-    text = f"Your Legal Core verification code for {r.request_number} is {code}. It expires in {s.otp_minutes} minutes. Do not share it."
-    sent = [notify.send(db, "sms", r.contact_phone, "Legal Core verification code", text, request=r)]
+    text = f"Your Legal Core Solutions verification code for {r.request_number} is {code}. It expires in {s.otp_minutes} minutes. Do not share it."
+    sent = [notify.send(db, "sms", r.contact_phone, "Legal Core Solutions verification code", text, request=r)]
     if r.contact_email:
-        sent.append(notify.send(db, "email", r.contact_email, "Legal Core verification code", text, request=r))
+        sent.append(notify.send(db, "email", r.contact_email, "Legal Core Solutions verification code", text, request=r))
     # Never store the code itself in the notification log.
     for n in sent:
         n.body = n.body.replace(code, "••••••")
@@ -86,7 +86,7 @@ def start(body: TrackStart, request: Request, db: DB):
     if not ok:
         if not s.demo_mode:
             db.commit()
-            raise HTTPException(503, "We could not send a verification code right now. Please contact Legal Core to check your request.")
+            raise HTTPException(503, "We could not send a verification code right now. Please contact Legal Core Solutions to check your request.")
         demo_code = code  # demo only: no SMS or email provider is connected
     ch.channel = ",".join(n.channel for n in ok) or "demo"
     audit(db, None, "track.code_sent", "request", r.request_number, ip, channels=ch.channel)

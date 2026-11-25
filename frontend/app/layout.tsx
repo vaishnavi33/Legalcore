@@ -6,9 +6,12 @@ import { UserProvider } from "@/components/UserProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Legal Core · Your legal work, simplified", template: "%s · Legal Core" },
+  // Link previews (WhatsApp, social media) need the full site address to find the logo image.
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
+  title: { default: "Legal Core Solutions · Your legal work, simplified", template: "%s · Legal Core Solutions" },
   description:
-    "Legal Core is a legal support and coordination agency in India. Professional legal support, documentation and coordination for lawyers, individuals and businesses.",
+    "Legal Core Solutions is a legal support and coordination agency in India. Professional legal support, documentation and coordination for lawyers, individuals and businesses.",
+  openGraph: { images: [{ url: "/brand/logo-full.jpg", width: 1536, height: 1024, alt: "Legal Core Solutions" }] },
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#13294b" };

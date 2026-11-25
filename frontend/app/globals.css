@@ -306,7 +306,12 @@ footer.site .brand b { color: #fff; }
 /* ---------- v2 additions ---------- */
 .h-dash { font-size: clamp(1.9rem, 4vw, 2.6rem); }
 .h3 { font-size: 1.3rem; }
-.logo { flex: none; display: block; }
+.logo { flex: none; display: block; height: auto; max-width: 100%; }
+/* The mark is navy on transparent: give it an ivory tile on dark grounds (dark mode header, navy footer). */
+footer.site .logo { background: #faf8f3; border-radius: 8px; padding: 4px 6px; box-sizing: content-box; }
+@media (prefers-color-scheme: dark) { header.site .logo { background: #faf8f3; border-radius: 8px; padding: 3px 5px; box-sizing: content-box; } }
+@media (max-width: 480px) { header.site .logo { width: 72px; } header.site .brand small { display: none; } }
+.about-badge { display: block; width: 100%; height: auto; border-radius: var(--radius-lg); background: #ffffff; border: 1px solid var(--line); }
 
 /* top utility bar */
 .topbar { background: var(--court); color: #dfe4ec; font-size: 0.82rem; }

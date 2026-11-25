@@ -51,7 +51,7 @@ export default function Home() {
       <section className="blk">
         <div className="wrap">
           <div className="sec-head">
-            <span className="label">How Legal Core works</span>
+            <span className="label">How Legal Core Solutions works</span>
             <h2>A managed service, not a marketplace</h2>
             <p className="muted">
               You do not browse or hire lawyers here. You tell us what you need; we understand the requirement, coordinate the right drafting professional or qualified
